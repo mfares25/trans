@@ -9,7 +9,7 @@ import { translatePending } from './translate.js';
 
 // ── env validation ────────────────────────────────────────────────────────────
 
-const missing = ['TWITTER_BEARER_TOKEN', 'ANTHROPIC_API_KEY'].filter((k) => !process.env[k]);
+const missing = ['TWITTER_BEARER_TOKEN'].filter((k) => !process.env[k]);
 if (missing.length) {
   console.error(`Missing required env vars: ${missing.join(', ')}`);
   console.error('Copy .env.example → .env and fill in your keys.');

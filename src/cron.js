@@ -1,7 +1,7 @@
 import cron from 'node-cron';
 import { fetchNewTweets } from './twitter.js';
 import { extractTransferData } from './claude.js';
-import { getSinceId, setSinceId, upsertTransfer, logTweet } from './db.js';
+import { getSinceId, setSinceId, upsertTransfer, logTweet, isTweetLogged } from './db.js';
 import { broadcast } from './api.js';
 import { translatePending } from './translate.js';
 
@@ -42,6 +42,8 @@ export async function pollOnce() {
   if (twitterItems.length) setSinceId(twitterItems.at(-1).id);
 
   for (const tweet of tweets) {
+    if (isTweetLogged(tweet.id)) continue;
+
     const preview = tweet.text.slice(0, 60).replace(/\n/g, ' ');
     console.log(`[poll]   tweet ${tweet.id}: "${preview}…"`);
 

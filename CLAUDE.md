@@ -12,7 +12,7 @@ A bilingual (Arabic/English) football transfer tracking system that collects tra
 - **Backend:** Express.js
 - **Frontend:** Vanilla JS + CSS (single HTML file at `public/index.html`)
 - **Database:** SQLite (`transfers.db`)
-- **AI:** Claude API (`claude-haiku-4-5-20251001`) — extraction + translation
+- **AI:** Local Claude Code CLI (`claude -p`, model `haiku`) — extraction + translation. Runs via the logged-in Claude Code session (no `ANTHROPIC_API_KEY`/billing).
 - **Scheduler:** `node-cron` — hourly polls
 - **RSS:** `rss-parser`
 
@@ -38,7 +38,8 @@ src/
   index.js      — Express server, startup
   cron.js       — Hourly poll logic, calls translatePending() after each poll
   twitter.js    — Nitter + RSS fetching
-  claude.js     — extractTransferData() via Claude API
+  claude.js     — extractTransferData() via claudeCli.js
+  claudeCli.js  — askClaude() wrapper around `claude -p` (local CLI, no API key)
   translate.js  — translatePending(), resolveFromClub(), Wikipedia photo fetch
   db.js         — All DB operations
   api.js        — REST endpoints + SSE feed
@@ -89,13 +90,14 @@ Dedup log. Tweet snowflake IDs and news article URLs both stored here.
 
 ```
 TWITTER_BEARER_TOKEN=...
-ANTHROPIC_API_KEY=...
 FABRIZIO_ROMANO_USER_ID=   # leave empty, resolved at runtime
 PORT=3000
-POLL_DISABLED=true|false   # set true to stop API usage
+POLL_DISABLED=true|false   # set true to stop AI calls
 ```
 
-**`POLL_DISABLED=true`** stops both hourly cron AND startup `translatePending()` — zero Anthropic API calls.
+**`POLL_DISABLED=true`** stops both hourly cron AND startup `translatePending()` — zero Claude CLI calls.
+
+No `ANTHROPIC_API_KEY` is required — `claudeCli.js` shells out to the local `claude -p` CLI, authenticated via the machine's logged-in Claude Code session.
 
 ---
 
@@ -162,9 +164,9 @@ Dark/light toggle, saved to `localStorage`.
 
 When `POLL_DISABLED=false`, after each poll:
 1. `getUntranslated()` — finds transfers missing `player_ar` or `from_club_country`
-2. If `from_club` is null → `resolveFromClub()` via Wikipedia + Claude (passes `to_club` to avoid wrong answer)
+2. If `from_club` is null → `resolveFromClub()` via Wikipedia + `claude -p` (passes `to_club` to avoid wrong answer)
 3. `fetchWikipediaPhoto()` — Wikipedia pageimages API with proper User-Agent
-4. Claude call: translates player name, clubs, summary to Arabic; extracts country names
+4. `claude -p` call (via `askClaude()`): translates player name, clubs, summary to Arabic; extracts country names
 5. `saveTranslation()` — stores all fields
 
 Arabic summaries have been manually rewritten for natural Arabic style (not literal translations).
@@ -178,3 +180,4 @@ Arabic summaries have been manually rewritten for natural Arabic style (not lite
 - **Club matching**: Fuzzy — strips FC/AC prefixes, uses substring matching. `from_club=null` matches anything (avoids false duplicates).
 - **Wikipedia 403**: Fixed by setting `User-Agent: TransferWatch/1.0`.
 - **No-cache**: Static files served with `Cache-Control: no-store`.
+- **Claude CLI dependency**: `askClaude()` (`src/claudeCli.js`) shells out to `claude -p --model haiku --output-format json --disallowedTools '*' --no-session-persistence`, run from `cwd: /tmp` to avoid picking up this repo's `CLAUDE.md`/context. Requires the `claude` binary on `PATH` and an active logged-in Claude Code session on the host — this will NOT work on a server without Claude Code installed and authenticated.

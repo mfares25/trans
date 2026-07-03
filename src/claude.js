@@ -1,6 +1,4 @@
-import Anthropic from '@anthropic-ai/sdk';
-
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+import { askClaude } from './claudeCli.js';
 
 const SYSTEM_PROMPT = `You are a football transfer data extraction system. Analyze tweets from journalist Fabrizio Romano and return a single JSON object — nothing else, no markdown, no explanation.
 
@@ -27,16 +25,7 @@ If the tweet is not about a player transfer or signing, set status to "not_trans
 const jsonBlockRe = /```(?:json)?\s*([\s\S]*?)```/;
 
 export async function extractTransferData(tweetText) {
-  const msg = await anthropic.messages.create({
-    model:      'claude-sonnet-4-6',
-    max_tokens: 256,
-    system:     SYSTEM_PROMPT,
-    messages: [
-      { role: 'user', content: `Tweet: "${tweetText}"` },
-    ],
-  });
-
-  const raw = msg.content[0].text.trim();
+  const raw = await askClaude(SYSTEM_PROMPT, `Tweet: "${tweetText}"`);
   const jsonText = jsonBlockRe.exec(raw)?.[1]?.trim() ?? raw;
 
   try {

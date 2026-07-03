@@ -1,8 +1,6 @@
-import Anthropic from '@anthropic-ai/sdk';
 import axios from 'axios';
 import { getUntranslated, saveTranslation, updateFromClub } from './db.js';
-
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+import { askClaude } from './claudeCli.js';
 
 const SYSTEM = `You are a football data assistant.
 Given transfer data, return ONLY a valid JSON object with these fields:
@@ -70,18 +68,12 @@ async function resolveFromClub(playerName, toClub) {
     ? `Wikipedia text: ${summary}\n\n`
     : `No Wikipedia page found. Use your football knowledge.\n\n`;
 
-  const msg = await anthropic.messages.create({
-    model: 'claude-haiku-4-5-20251001',
-    max_tokens: 200,
-    messages: [{
-      role: 'user',
-      content: `${context}${toNote}\n\nWhat club did ${playerName} play for BEFORE their current/upcoming transfer?\nReturn ONLY valid JSON: { "club_en": "Club Name", "club_ar": "اسم النادي بالعربية", "country": "country in english lowercase" }\nIf truly unknown return {"club_en":null,"club_ar":null,"country":null}`,
-    }],
-  });
+  const userPrompt = `${context}${toNote}\n\nWhat club did ${playerName} play for BEFORE their current/upcoming transfer?\nReturn ONLY valid JSON: { "club_en": "Club Name", "club_ar": "اسم النادي بالعربية", "country": "country in english lowercase" }\nIf truly unknown return {"club_en":null,"club_ar":null,"country":null}`;
 
   try {
-    const raw = msg.content[0].text.trim().replace(/^```(?:json)?\s*/,'').replace(/\s*```$/,'');
-    return JSON.parse(raw);
+    const raw = await askClaude('You are a football data assistant. Return ONLY valid JSON, no markdown, no explanation.', userPrompt);
+    const jsonText = raw.replace(/^```(?:json)?\s*/,'').replace(/\s*```$/,'');
+    return JSON.parse(jsonText);
   } catch {
     return null;
   }
@@ -92,25 +84,16 @@ async function translateOne(tr) {
   const tweetText  = rawTweets[0] || '';
 
   // Run Claude translation and Wikipedia photo fetch in parallel
-  const [msg, photo_url] = await Promise.all([
-    anthropic.messages.create({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 600,
-      system: SYSTEM,
-      messages: [{
-        role: 'user',
-        content: JSON.stringify({
-          player:        tr.player,
-          from_club:     tr.from_club,
-          to_club:       tr.to_club,
-          tweet_preview: tweetText.slice(0, 300),
-        }),
-      }],
-    }),
+  const [raw, photo_url] = await Promise.all([
+    askClaude(SYSTEM, JSON.stringify({
+      player:        tr.player,
+      from_club:     tr.from_club,
+      to_club:       tr.to_club,
+      tweet_preview: tweetText.slice(0, 300),
+    })),
     fetchWikipediaPhoto(tr.player),
   ]);
 
-  const raw      = msg.content[0].text.trim();
   const jsonText = raw.replace(/^```(?:json)?\s*/,'').replace(/\s*```$/,'').trim();
   const result   = JSON.parse(jsonText);
 

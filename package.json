@@ -9,11 +9,10 @@
     "dev": "node --watch src/index.js"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.55.0",
     "axios": "^1.7.9",
-    "rss-parser": "^3.13.0",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "node-cron": "^3.0.3"
+    "node-cron": "^3.0.3",
+    "rss-parser": "^3.13.0"
   }
 }

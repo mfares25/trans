@@ -158,6 +158,10 @@ export function upsertTransfer(data, tweetId, tweetText, source = null, pubDate 
   return { ...getTransferById(Number(result.lastInsertRowid)), _action: 'created' };
 }
 
+export function isTweetLogged(tweetId) {
+  return !!db.prepare('SELECT 1 FROM tweet_log WHERE tweet_id = ?').get(tweetId);
+}
+
 export function logTweet(tweetId, tweetText, transferId, extracted) {
   db.prepare(`
     INSERT OR IGNORE INTO tweet_log (tweet_id, tweet_text, transfer_id, extracted)
