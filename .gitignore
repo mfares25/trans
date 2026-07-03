@@ -1,0 +1,9 @@
+node_modules/
+.env
+keys
+keys.pub
+transfers.db
+transfers.db-shm
+transfers.db-wal
+.DS_Store
+.claude/settings.local.json

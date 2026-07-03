@@ -1,0 +1,1480 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title id="pageTitle">TransferWatch — Romano Live</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet"/>
+<style>
+/* ═══════════════════════════════════════════════════
+   TOKENS
+═══════════════════════════════════════════════════ */
+:root{
+  --radius:14px;--radius-sm:8px;--radius-xs:6px;
+  --green:#22c55e;--green-d:rgba(34,197,94,.12);
+  --blue:#3b82f6; --blue-d:rgba(59,130,246,.12);
+  --orange:#f59e0b;--orange-d:rgba(245,158,11,.12);
+  --red:#ef4444;  --red-d:rgba(239,68,68,.12);
+  --purple:#a855f7;--purple-d:rgba(168,85,247,.12);
+  --cyan:#06b6d4; --cyan-d:rgba(6,182,212,.12);
+  --yellow:#eab308;--yellow-d:rgba(234,179,8,.12);
+  --trans: all .2s ease;
+}
+[data-theme="dark"]{
+  --bg:#080d16;--bg2:#0d1424;
+  --sur:#111827;--sur2:#1a2336;--sur3:#1f2a40;
+  --brd:#1e2d42;--brd2:#27384f;
+  --txt:#e2eaf5;--txt2:#94a3b8;--txt3:#64748b;
+  --shadow:0 4px 24px rgba(0,0,0,.4);
+  --shadow-sm:0 2px 8px rgba(0,0,0,.3);
+}
+[data-theme="light"]{
+  --bg:#f1f5f9;--bg2:#e8edf3;
+  --sur:#ffffff;--sur2:#f8fafc;--sur3:#f1f5f9;
+  --brd:#e2e8f0;--brd2:#cbd5e1;
+  --txt:#0f172a;--txt2:#475569;--txt3:#94a3b8;
+  --shadow:0 4px 24px rgba(0,0,0,.08);
+  --shadow-sm:0 2px 8px rgba(0,0,0,.06);
+}
+
+/* ═══════════════════════════════════════════════════
+   RESET
+═══════════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:var(--bg);color:var(--txt);
+  font-family:'Inter',sans-serif;font-size:14px;line-height:1.5;
+  display:flex;flex-direction:column;
+  transition:background .3s,color .3s;
+  overflow:hidden;
+}
+[lang="ar"] body,[lang="ar"] *{font-family:'Tajawal',sans-serif}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;border:none;background:none;color:inherit;font:inherit}
+input,select{font:inherit;color:inherit;outline:none}
+
+/* ═══════════════════════════════════════════════════
+   HEADER
+═══════════════════════════════════════════════════ */
+.header{
+  background:var(--sur);border-bottom:1px solid var(--brd);
+  padding:0 20px;height:58px;
+  display:flex;align-items:center;gap:16px;
+  flex-shrink:0;z-index:30;position:relative;
+}
+.logo{
+  display:flex;align-items:center;gap:9px;text-decoration:none;
+}
+.logo-icon{
+  width:36px;height:36px;border-radius:10px;
+  background:linear-gradient(135deg,#3b82f6 0%,#8b5cf6 100%);
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0;
+}
+.logo-text{font-size:16px;font-weight:800;letter-spacing:-.3px}
+.logo-text em{font-style:normal;color:var(--blue)}
+
+/* nav tabs */
+.nav-tabs{
+  display:flex;gap:2px;
+  background:var(--sur2);border:1px solid var(--brd);
+  border-radius:10px;padding:3px;
+  margin-inline-start:8px;
+}
+.nav-tab{
+  padding:5px 14px;border-radius:7px;
+  font-size:12px;font-weight:600;color:var(--txt2);
+  transition:var(--trans);white-space:nowrap;
+  display:flex;align-items:center;gap:5px;
+}
+.nav-tab:hover{color:var(--txt);background:var(--sur3)}
+.nav-tab.active{background:var(--blue);color:#fff}
+.nav-tab .tab-count{
+  background:rgba(255,255,255,.2);border-radius:20px;
+  padding:0 6px;font-size:10px;font-weight:700;
+  min-width:18px;text-align:center;
+}
+.nav-tab:not(.active) .tab-count{
+  background:var(--brd);color:var(--txt3);
+}
+
+.header-right{margin-inline-start:auto;display:flex;align-items:center;gap:8px}
+
+/* live badge */
+.live-badge{
+  display:flex;align-items:center;gap:6px;
+  background:var(--sur2);border:1px solid var(--brd);
+  border-radius:20px;padding:5px 12px;font-size:11px;color:var(--txt2);
+}
+.live-dot{
+  width:7px;height:7px;border-radius:50%;
+  background:var(--red);flex-shrink:0;
+  animation:pulse 2s infinite;
+}
+.live-dot.on{background:var(--green)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* icon buttons */
+.icon-btn{
+  width:36px;height:36px;border-radius:9px;
+  background:var(--sur2);border:1px solid var(--brd);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;transition:var(--trans);
+}
+.icon-btn:hover{border-color:var(--brd2);background:var(--sur3)}
+
+.lang-btn{
+  height:36px;padding:0 14px;border-radius:9px;
+  background:var(--sur2);border:1px solid var(--brd);
+  font-size:12px;font-weight:700;
+  transition:var(--trans);
+}
+.lang-btn:hover{border-color:var(--blue);color:var(--blue)}
+
+/* ═══════════════════════════════════════════════════
+   FILTER BAR
+═══════════════════════════════════════════════════ */
+.filter-bar{
+  background:var(--sur);border-bottom:1px solid var(--brd);
+  padding:10px 20px;
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  flex-shrink:0;
+}
+.search-wrap{
+  position:relative;flex:1;min-width:180px;max-width:280px;
+}
+.search-icon{
+  position:absolute;inset-inline-start:11px;top:50%;
+  transform:translateY(-50%);color:var(--txt3);font-size:13px;
+  pointer-events:none;
+}
+.search-input{
+  width:100%;background:var(--sur2);border:1px solid var(--brd);
+  border-radius:var(--radius-sm);padding:7px 10px 7px 34px;
+  font-size:13px;transition:border-color .2s;color:var(--txt);
+}
+.search-input:focus{border-color:var(--blue)}
+.filter-select{
+  background:var(--sur2);border:1px solid var(--brd);
+  border-radius:var(--radius-sm);padding:7px 10px;
+  font-size:12px;color:var(--txt);transition:border-color .2s;
+  -webkit-appearance:none;
+}
+.filter-select:focus{border-color:var(--blue)}
+.sort-label{font-size:12px;color:var(--txt3);font-weight:500;white-space:nowrap}
+.filter-bar-right{margin-inline-start:auto;display:flex;align-items:center;gap:8px}
+.result-count{font-size:12px;color:var(--txt3)}
+
+/* ═══════════════════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════════════════ */
+.page-layout{flex:1;overflow-y:auto;padding:16px 20px}
+
+.cards-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  align-content:start;
+}
+
+/* ═══════════════════════════════════════════════════
+   STATS ROW (inline in filter bar)
+═══════════════════════════════════════════════════ */
+.stats-inline{display:flex;align-items:center;gap:6px}
+.stat-pill{
+  display:flex;align-items:center;gap:5px;
+  background:var(--sur2);border:1px solid var(--brd);
+  border-radius:20px;padding:4px 10px;
+  font-size:11px;font-weight:600;color:var(--txt2);
+}
+.stat-pill .sv{font-weight:800;color:var(--txt)}
+
+/* ═══════════════════════════════════════════════════
+   TRANSFER CARD
+═══════════════════════════════════════════════════ */
+.t-card{
+  background:var(--sur);border:1px solid var(--brd);
+  border-radius:var(--radius);overflow:hidden;
+  transition:border-color .2s,box-shadow .2s;
+  display:flex;flex-direction:column;
+  cursor:pointer;
+  perspective:1200px;
+}
+.t-card:hover{border-color:var(--brd2);box-shadow:var(--shadow)}
+.t-card.new{animation:cardIn .5s ease-out}
+@keyframes cardIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── FLIP ── */
+.card-front,.card-back{transition:opacity .18s ease}
+
+/* ── BACK FACE ── */
+.card-back{display:none;flex-direction:column;flex:1}
+.card-back-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px;background:var(--sur2);
+  border-bottom:1px solid var(--brd);
+  font-size:12px;font-weight:700;color:var(--txt);
+}
+.flip-close{
+  background:none;border:none;cursor:pointer;
+  font-size:14px;color:var(--txt3);padding:2px 6px;
+  border-radius:6px;transition:background .15s;
+}
+.flip-close:hover{background:var(--brd)}
+.tweet-list{overflow-y:auto;max-height:320px}
+.tweet-item{
+  display:block;text-decoration:none;color:inherit;
+  padding:10px 14px;border-bottom:1px solid var(--brd);
+  transition:background .15s;
+}
+.tweet-item:last-child{border-bottom:none}
+.tweet-item:hover{background:var(--sur2)}
+.tweet-item-text{
+  font-size:12px;color:var(--txt);line-height:1.6;margin-bottom:5px;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
+}
+.tweet-item-meta{
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:10px;color:var(--txt3);
+}
+.tweet-item-link{color:var(--blue);font-weight:600}
+
+/* top bar: badges + source */
+.card-topbar{
+  display:flex;align-items:center;gap:6px;
+  padding:9px 12px;border-bottom:1px solid var(--brd);
+  background:var(--sur2);flex-wrap:wrap;
+}
+.source-tag{margin-inline-start:auto;font-size:10px;color:var(--txt3);white-space:nowrap}
+
+/* badges */
+.badge{
+  display:inline-flex;align-items:center;gap:4px;
+  border-radius:20px;padding:3px 9px;
+  font-size:10px;font-weight:700;letter-spacing:.2px;white-space:nowrap;
+}
+.badge-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.b-confirmed   {background:var(--green-d); color:var(--green)}
+.b-agreement   {background:var(--cyan-d);  color:var(--cyan)}
+.b-adv-talks   {background:var(--blue-d);  color:var(--blue)}
+.b-talks       {background:var(--orange-d);color:var(--orange)}
+.b-interest    {background:var(--purple-d);color:var(--purple)}
+.b-loan        {background:var(--cyan-d);  color:var(--cyan)}
+.b-rejected,.b-cancelled{background:var(--red-d);color:var(--red)}
+.b-default     {background:var(--sur3);    color:var(--txt3)}
+.b-permanent   {background:var(--sur3);    color:var(--txt2)}
+.b-free        {background:var(--green-d); color:var(--green)}
+.b-rumour      {background:var(--yellow-d);color:var(--yellow)}
+
+/* ── CARD MAIN ROW ── */
+.card-main{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 14px;
+  border-bottom:1px solid var(--brd);
+}
+.player-info{
+  display:flex;align-items:center;gap:9px;
+  flex-shrink:0;max-width:45%;
+}
+.player-photo-wrap{
+  position:relative;
+  width:48px;height:48px;border-radius:50%;
+  border:2px solid var(--brd);
+  overflow:visible;flex-shrink:0;
+  background:var(--sur3);
+}
+.player-photo-wrap img,.player-photo-wrap .player-initials{
+  border-radius:50%;overflow:hidden;
+}
+.player-flag-badge{
+  position:absolute;bottom:-3px;right:-3px;
+  font-size:14px;line-height:1;
+  filter:drop-shadow(0 1px 3px rgba(0,0,0,.6));
+  pointer-events:none;
+}
+.player-photo-wrap img{width:100%;height:100%;object-fit:cover;display:block}
+.player-initials{
+  width:100%;height:100%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:800;color:var(--txt2);
+}
+.player-name{font-size:13px;font-weight:800;line-height:1.3;letter-spacing:-.1px}
+.card-sep{width:1px;height:36px;background:var(--brd);flex-shrink:0}
+.clubs-inline{
+  display:flex;align-items:center;gap:6px;
+  flex:1;min-width:0;
+}
+.club-inline{
+  display:flex;align-items:center;gap:4px;
+  flex:1;min-width:0;
+}
+.club-flag{font-size:16px;line-height:1;flex-shrink:0}
+.club-inline-name{
+  font-size:11px;font-weight:700;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.arrow-icon{font-size:16px;color:var(--blue);flex-shrink:0}
+[dir="rtl"] .arrow-icon{transform:scaleX(-1)}
+.fee-pill{
+  background:var(--blue-d);color:var(--blue);
+  border-radius:20px;padding:2px 7px;
+  font-size:10px;font-weight:700;white-space:nowrap;
+}
+
+/* tweet preview */
+.tweet-preview{
+  margin:0 12px 0;
+  padding:9px 11px;
+  background:var(--sur2);border:1px solid var(--brd);
+  border-radius:var(--radius-sm);
+  font-size:11px;color:var(--txt2);line-height:1.5;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.tweet-preview::before{content:'"';color:var(--blue);font-size:14px;font-weight:800;margin-inline-end:2px}
+
+/* card footer */
+.card-footer{
+  display:flex;align-items:center;gap:8px;
+  padding:9px 12px;border-top:1px solid var(--brd);
+  background:var(--sur2);font-size:11px;color:var(--txt3);
+  margin-top:auto;
+}
+.footer-sep{flex:1}
+.conf-row{display:flex;align-items:center;gap:5px}
+.conf-track{width:55px;height:4px;background:var(--brd);border-radius:2px;overflow:hidden}
+.conf-fill{height:100%;border-radius:2px;transition:width .5s}
+.conf-pct{font-size:11px;font-weight:700;color:var(--txt3)}
+
+/* ═══════════════════════════════════════════════════
+   PREDICTION
+═══════════════════════════════════════════════════ */
+.prediction{
+  padding:12px 14px;border-top:1px solid var(--brd);
+}
+.pred-title{
+  font-size:11px;font-weight:700;color:var(--txt2);
+  text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;
+  display:flex;align-items:center;gap:6px;
+}
+.pred-title::before{
+  content:'';flex:1;height:1px;background:var(--brd);
+}
+.pred-title::after{
+  content:'';flex:1;height:1px;background:var(--brd);
+}
+.pred-btns{display:flex;gap:8px;margin-bottom:8px}
+.pred-btn{
+  flex:1;padding:8px;border-radius:var(--radius-sm);
+  border:1.5px solid var(--brd);background:var(--sur);
+  font-size:12px;font-weight:700;transition:var(--trans);
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.pred-btn:hover:not(:disabled):not(.voted){border-color:var(--brd2);background:var(--sur2)}
+.pred-btn.yes:hover:not(:disabled):not(.voted){border-color:var(--green);color:var(--green);background:var(--green-d)}
+.pred-btn.no:hover:not(:disabled):not(.voted){border-color:var(--red);color:var(--red);background:var(--red-d)}
+.pred-btn.voted-yes{border-color:var(--green);color:var(--green);background:var(--green-d)}
+.pred-btn.voted-no {border-color:var(--red);  color:var(--red);  background:var(--red-d)}
+.pred-btn:disabled{opacity:.6;cursor:default}
+.pred-bar-wrap{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--txt3)}
+.pred-bar{flex:1;height:5px;background:var(--brd);border-radius:3px;overflow:hidden;display:flex}
+.pred-bar-yes{height:100%;background:var(--green);transition:width .5s}
+.pred-bar-no {height:100%;background:var(--red);  transition:width .5s}
+.pred-votes{font-size:10px;color:var(--txt3);text-align:center;margin-top:4px}
+
+
+/* ═══════════════════════════════════════════════════
+   EMPTY STATE
+═══════════════════════════════════════════════════ */
+.empty{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:60px 20px;
+  text-align:center;gap:12px;color:var(--txt3);
+  flex:1;
+}
+.empty-icon{
+  width:60px;height:60px;border-radius:16px;
+  background:var(--sur2);border:1px solid var(--brd);
+  display:flex;align-items:center;justify-content:center;font-size:28px;
+}
+.empty p{font-size:13px;max-width:220px;line-height:1.5}
+
+/* ═══════════════════════════════════════════════════
+   CHIP COUNT
+═══════════════════════════════════════════════════ */
+.chip{
+  background:var(--brd);color:var(--txt3);
+  border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700;
+}
+
+/* ═══════════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════════ */
+@media(max-width:1100px){.cards-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:680px){
+  .cards-grid{grid-template-columns:1fr}
+  .nav-tabs{display:none}
+  .stats-inline{display:none}
+}
+
+/* ═══════════════════════════════════════════════════
+   SCROLLBAR
+═══════════════════════════════════════════════════ */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--brd);border-radius:3px}
+
+/* ═══════════════════════════════════════════════════
+   COMMENTS
+═══════════════════════════════════════════════════ */
+.share-btn{
+  display:flex;align-items:center;justify-content:center;
+  background:none;border:1px solid var(--brd2);
+  color:var(--txt3);border-radius:20px;
+  width:28px;height:28px;font-size:13px;
+  cursor:pointer;transition:var(--trans);flex-shrink:0;
+}
+.share-btn:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-d)}
+.share-btn.loading{opacity:.5;pointer-events:none}
+
+.comment-btn{
+  display:flex;align-items:center;gap:5px;
+  background:none;border:1px solid var(--brd2);
+  color:var(--txt2);border-radius:20px;
+  padding:4px 10px;font-size:12px;font-weight:600;
+  cursor:pointer;transition:var(--trans);
+}
+.comment-btn:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-d)}
+.comment-btn .cmt-count{
+  background:var(--brd2);border-radius:10px;
+  padding:0 6px;font-size:11px;min-width:18px;text-align:center;
+}
+
+.cmt-overlay{
+  position:fixed;inset:0;z-index:200;
+  background:rgba(0,0,0,.7);backdrop-filter:blur(6px);
+  display:flex;align-items:flex-end;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .25s ease;
+}
+.cmt-overlay.open{opacity:1;pointer-events:all}
+
+.cmt-panel{
+  width:100%;max-width:560px;
+  background:var(--sur);border-radius:24px 24px 0 0;
+  border-top:1px solid var(--brd2);
+  display:flex;flex-direction:column;
+  max-height:85vh;
+  transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);
+}
+.cmt-overlay.open .cmt-panel{transform:translateY(0)}
+
+.cmt-drag{width:40px;height:4px;background:var(--brd2);border-radius:4px;margin:12px auto 0}
+
+.cmt-header{
+  padding:16px 20px 12px;border-bottom:1px solid var(--brd);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.cmt-header-info{}
+.cmt-header-player{font-size:15px;font-weight:700;color:var(--txt)}
+.cmt-header-clubs{font-size:12px;color:var(--txt3);margin-top:2px}
+.cmt-close{
+  background:none;border:none;color:var(--txt3);
+  font-size:20px;cursor:pointer;padding:4px 8px;border-radius:8px;
+  transition:var(--trans);
+}
+.cmt-close:hover{color:var(--txt);background:var(--sur2)}
+
+.cmt-list{flex:1;overflow-y:auto;padding:12px 20px;display:flex;flex-direction:column;gap:12px}
+
+.cmt-empty{
+  text-align:center;padding:40px 20px;color:var(--txt3);
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+}
+.cmt-empty-icon{font-size:32px}
+
+.cmt-item{display:flex;gap:10px;align-items:flex-start}
+.cmt-avatar{
+  width:34px;height:34px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;color:#fff;
+}
+.cmt-body{flex:1;min-width:0}
+.cmt-meta{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.cmt-name{font-size:13px;font-weight:600;color:var(--txt)}
+.cmt-time{font-size:11px;color:var(--txt3)}
+.cmt-text{
+  font-size:13px;color:var(--txt2);line-height:1.5;
+  background:var(--sur2);border-radius:0 12px 12px 12px;
+  padding:8px 12px;word-break:break-word;
+}
+[dir="rtl"] .cmt-text{border-radius:12px 0 12px 12px}
+
+.cmt-form{
+  padding:12px 20px 20px;border-top:1px solid var(--brd);
+  display:flex;flex-direction:column;gap:8px;
+}
+.cmt-form-row{display:flex;gap:8px}
+.cmt-input-name{
+  flex:0 0 120px;padding:8px 12px;
+  background:var(--sur2);border:1px solid var(--brd2);
+  border-radius:10px;color:var(--txt);font-size:13px;outline:none;
+  transition:var(--trans);
+}
+.cmt-input-name:focus{border-color:var(--blue)}
+.cmt-input-body{
+  flex:1;padding:8px 12px;resize:none;height:38px;
+  background:var(--sur2);border:1px solid var(--brd2);
+  border-radius:10px;color:var(--txt);font-size:13px;outline:none;
+  transition:var(--trans);font-family:inherit;
+}
+.cmt-input-body:focus{border-color:var(--blue);height:70px}
+.cmt-submit{
+  align-self:flex-end;
+  background:var(--blue);color:#fff;border:none;
+  padding:8px 18px;border-radius:10px;font-size:13px;font-weight:600;
+  cursor:pointer;transition:var(--trans);
+}
+.cmt-submit:hover{opacity:.85}
+.cmt-submit:disabled{opacity:.4;cursor:default}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════ HEADER ══════════════════════════════ -->
+<header class="header">
+  <a class="logo" href="#">
+    <div class="logo-icon">⚽</div>
+    <div class="logo-text" id="logoText">Transfer<em>Watch</em></div>
+  </a>
+
+  <nav class="nav-tabs" id="navTabs">
+    <button class="nav-tab active" data-page="all">
+      <span data-i18n="page_all">All</span>
+      <span class="tab-count" id="cnt-all">0</span>
+    </button>
+    <button class="nav-tab" data-page="confirmed">
+      <span data-i18n="page_confirmed">Confirmed</span>
+      <span class="tab-count" id="cnt-confirmed">0</span>
+    </button>
+    <button class="nav-tab" data-page="rumours">
+      <span data-i18n="page_rumours">Rumours</span>
+      <span class="tab-count" id="cnt-rumours">0</span>
+    </button>
+    <button class="nav-tab" data-page="loans">
+      <span data-i18n="page_loans">Loans</span>
+      <span class="tab-count" id="cnt-loans">0</span>
+    </button>
+  </nav>
+
+  <div class="header-right">
+    <div class="live-badge">
+      <div class="live-dot" id="liveDot"></div>
+      <span id="liveStatus" data-i18n="connecting">Connecting…</span>
+    </div>
+    <button class="icon-btn" id="themeBtn">🌙</button>
+    <button class="lang-btn" id="langBtn">عربي</button>
+  </div>
+</header>
+
+
+<!-- ══════════════════════════════ COMMENTS MODAL ══════════════════════════════ -->
+<div class="cmt-overlay" id="cmtOverlay" onclick="handleOverlayClick(event)">
+  <div class="cmt-panel" id="cmtPanel">
+    <div class="cmt-drag"></div>
+    <div class="cmt-header">
+      <div class="cmt-header-info">
+        <div class="cmt-header-player" id="cmtPlayer"></div>
+        <div class="cmt-header-clubs" id="cmtClubs"></div>
+      </div>
+      <button class="cmt-close" onclick="closeComments()">✕</button>
+    </div>
+    <div class="cmt-list" id="cmtList"></div>
+    <div class="cmt-form">
+      <div class="cmt-form-row">
+        <input class="cmt-input-name" id="cmtName" maxlength="30"/>
+        <textarea class="cmt-input-body" id="cmtBody" maxlength="280" rows="1"></textarea>
+      </div>
+      <button class="cmt-submit" id="cmtSubmit" onclick="submitComment()">↑</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════ FILTER BAR ══════════════════════════════ -->
+<div class="filter-bar">
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input class="search-input" id="searchInput" data-i18n-ph="search_ph" placeholder="Search player or club…"/>
+  </div>
+  <select class="filter-select" id="statusFilter">
+    <option value="" data-i18n="status_all">All statuses</option>
+    <option value="confirmed"      data-i18n="confirmed">Confirmed</option>
+    <option value="agreement"      data-i18n="agreement">Agreement</option>
+    <option value="advanced_talks" data-i18n="adv_talks">Advanced Talks</option>
+    <option value="talks"          data-i18n="talks">Talks</option>
+    <option value="interest"       data-i18n="interest">Interest</option>
+    <option value="loan"           data-i18n="loan">Loan</option>
+    <option value="rejected"       data-i18n="rejected">Rejected</option>
+    <option value="cancelled"      data-i18n="cancelled">Cancelled</option>
+  </select>
+  <span class="sort-label" data-i18n="sort_by">Sort:</span>
+  <select class="filter-select" id="sortSelect">
+    <option value="latest"     data-i18n="sort_latest">Latest</option>
+    <option value="confidence" data-i18n="sort_conf">Confidence</option>
+    <option value="votes"      data-i18n="sort_votes">Most Voted</option>
+  </select>
+  <div class="filter-bar-right">
+    <div class="stats-inline">
+      <div class="stat-pill">🔄 <span class="sv" id="sTotal">—</span> <span data-i18n="stat_total">Total</span></div>
+      <div class="stat-pill">✅ <span class="sv" id="sConf">—</span> <span data-i18n="stat_conf">Confirmed</span></div>
+      <div class="stat-pill">📰 <span class="sv" id="sTweets">—</span> <span data-i18n="stat_tweets">Sources</span></div>
+    </div>
+    <span class="result-count" id="resultCount"></span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════ LAYOUT ══════════════════════════════ -->
+<div class="page-layout">
+  <div class="cards-grid" id="cardsCol"></div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+// TRANSLATIONS
+// ══════════════════════════════════════════════
+const T = {
+  en:{
+    page_title:'TransferWatch — Romano Live',
+    logo_html:'Transfer<em>Watch</em>',
+    page_all:'All',page_confirmed:'Confirmed',page_rumours:'Rumours',page_loans:'Loans',
+    connecting:'Connecting…',live:'Live',updated:'Updated',
+    search_ph:'Search player or club…',
+    status_all:'All statuses',confirmed:'Confirmed',agreement:'Agreement',
+    adv_talks:'Advanced Talks',talks:'Talks',interest:'Interest',
+    loan:'Loan',rejected:'Rejected',cancelled:'Cancelled',
+    sort_by:'Sort:',sort_latest:'Latest',sort_conf:'Confidence',sort_votes:'Most Voted',
+    stat_total:'Total',stat_conf:'Confirmed',stat_tweets:'Sources',
+    from_lbl:'FROM',to_lbl:'TO',open_tweet:'Open ↗',
+    conf_lbl:'Conf.',
+    source:'Fabrizio Romano',
+    tw_single:'tweet',tw_plural:'tweets',
+    type_permanent:'Permanent',type_loan:'Loan',type_free:'Free',type_rumour:'Rumour',
+    pred_title:'Will this happen?',
+    vote_yes:'👍 Yes',vote_no:'👎 No',
+    votes_none:'No votes yet',votes_count:(n)=>`${n} vote${n!==1?'s':''}`,
+    no_transfers:'No transfers found.',
+    just_now:'just now',min_ago:(m)=>`${m}m ago`,hr_ago:(h)=>`${h}h ago`,day_ago:(d)=>`${d}d ago`,
+    unknown:'Unknown',lang_btn:'عربي',
+    results:(n)=>`${n} transfer${n!==1?'s':''}`,
+    cmt_title:'Comments',cmt_placeholder:'Write a comment…',cmt_name_ph:'Your name',
+    cmt_submit:'Send',cmt_empty:'Be the first to comment!',cmt_anon:'Fan',
+  },
+  ar:{
+    page_title:'متتبع الانتقالات — رومانو مباشر',
+    logo_html:'متتبع <em>الانتقالات</em>',
+    page_all:'الكل',page_confirmed:'مؤكدة',page_rumours:'إشاعات',page_loans:'إعارات',
+    connecting:'جارٍ الاتصال…',live:'مباشر',updated:'محدّث',
+    search_ph:'ابحث عن لاعب أو نادٍ…',
+    status_all:'كل الحالات',confirmed:'مؤكد',agreement:'اتفاق',
+    adv_talks:'محادثات متقدمة',talks:'محادثات',interest:'اهتمام',
+    loan:'إعارة',rejected:'مرفوض',cancelled:'ملغي',
+    sort_by:'ترتيب:',sort_latest:'الأحدث',sort_conf:'الثقة',sort_votes:'الأكثر تصويتاً',
+    stat_total:'الإجمالي',stat_conf:'مؤكدة',stat_tweets:'المصادر',
+    from_lbl:'من',to_lbl:'إلى',
+    conf_lbl:'ثقة',
+    source:'فابريزيو رومانو',
+    tw_single:'مصدر',tw_plural:'مصادر',
+    type_permanent:'دائم',type_loan:'إعارة',type_free:'مجاني',type_rumour:'إشاعة',
+    pred_title:'هل سيحدث هذا الانتقال؟',
+    vote_yes:'👍 نعم',vote_no:'👎 لا',
+    votes_none:'لا توجد أصوات بعد',votes_count:(n)=>`${n} ${n===1?'صوت':'أصوات'}`,
+    no_transfers:'لا توجد انتقالات.',
+    just_now:'الآن',min_ago:(m)=>`منذ ${m} د`,hr_ago:(h)=>`منذ ${h} س`,day_ago:(d)=>`منذ ${d} ي`,
+    unknown:'غير معروف',lang_btn:'English',
+    results:(n)=>`${n} ${n===1?'انتقال':'انتقالات'}`,
+    open_tweet:'فتح المصدر',
+    cmt_title:'التعليقات',cmt_placeholder:'اكتب تعليقاً…',cmt_name_ph:'اسمك',
+    cmt_submit:'إرسال',cmt_empty:'كن أول من يعلق!',cmt_anon:'مشجع',
+  },
+};
+
+let lang  = localStorage.getItem('lang')  || 'en';
+let theme = localStorage.getItem('theme') || 'dark';
+const t = k => {
+  const v = T[lang][k];
+  return typeof v === 'function' ? v : (v ?? k);
+};
+const tf = (k, ...a) => {
+  const v = T[lang][k];
+  return typeof v === 'function' ? v(...a) : (v ?? k);
+};
+
+function applyLang() {
+  const ar = lang === 'ar';
+  document.documentElement.lang = lang;
+  document.documentElement.dir  = ar ? 'rtl' : 'ltr';
+
+  // Page title & logo
+  document.getElementById('pageTitle').textContent  = t('page_title');
+  document.getElementById('logoText').innerHTML     = t('logo_html');
+  document.getElementById('langBtn').textContent    = t('lang_btn');
+
+  // data-i18n static elements
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    el.textContent = t(el.dataset.i18n);
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+    el.placeholder = t(el.dataset.i18nPh);
+  });
+
+  renderAll();
+}
+
+function applyTheme() {
+  document.documentElement.dataset.theme = theme;
+  document.getElementById('themeBtn').textContent = theme === 'dark' ? '☀️' : '🌙';
+}
+
+document.getElementById('langBtn').addEventListener('click', () => {
+  lang = lang === 'en' ? 'ar' : 'en';
+  localStorage.setItem('lang', lang);
+  applyLang();
+});
+document.getElementById('themeBtn').addEventListener('click', () => {
+  theme = theme === 'dark' ? 'light' : 'dark';
+  localStorage.setItem('theme', theme);
+  applyTheme();
+});
+
+// ══════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════
+// Extract timestamp from Twitter snowflake ID
+function snowflakeDate(id) {
+  try {
+    return new Date(Number((BigInt(id) >> 22n) + 1288834974657n));
+  } catch { return null; }
+}
+
+function flipCard(card) {
+  const front = card.querySelector('.card-front');
+  const back  = card.querySelector('.card-back');
+  if (card.dataset.busy) return;
+  card.dataset.busy = '1';
+
+  const showingFront = front.style.display !== 'none';
+  const hide = showingFront ? front : back;
+  const show = showingFront ? back  : front;
+
+  hide.style.opacity = '0';
+  setTimeout(() => {
+    hide.style.display = 'none';
+    hide.style.opacity = '';
+    show.style.display = showingFront ? 'flex' : '';
+    show.style.opacity = '0';
+    requestAnimationFrame(() => {
+      show.style.opacity = '1';
+      setTimeout(() => { show.style.opacity = ''; delete card.dataset.busy; }, 180);
+    });
+  }, 180);
+}
+
+function timeAgo(ds) {
+  const m = Math.floor((Date.now() - new Date(ds)) / 60000);
+  if (m < 1)  return t('just_now');
+  if (m < 60) return tf('min_ago', m);
+  const h = Math.floor(m / 60);
+  if (h < 24) return tf('hr_ago', h);
+  return tf('day_ago', Math.floor(h / 24));
+}
+
+function esc(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// Club avatar: deterministic color from club name
+const AV_COLORS = [
+  ['#1e3a5f','#93c5fd'],['#14532d','#86efac'],['#3b0764','#d8b4fe'],
+  ['#451a03','#fcd34d'],['#1c1917','#c4b5fd'],['#0c4a6e','#7dd3fc'],
+  ['#166534','#4ade80'],['#4c0519','#fca5a5'],['#172554','#a5b4fc'],
+  ['#1a2e05','#bef264'],['#292524','#f9a8d4'],['#0f172a','#67e8f9'],
+];
+function clubAv(name) {
+  if (!name) return { bg:'#1e2a3d', fg:'#64748b', abbr:'?' };
+  let h = 0;
+  for (const c of name) h = (h * 31 + c.charCodeAt(0)) & 0xffff;
+  const [bg, fg] = AV_COLORS[h % AV_COLORS.length];
+  const w = name.trim().split(/\s+/);
+  const abbr = w.length >= 2 ? (w[0][0]+w[1][0]).toUpperCase() : name.slice(0,2).toUpperCase();
+  return { bg, fg, abbr };
+}
+
+// Infer transfer type
+function inferType(tr) {
+  if (tr.status === 'loan') return 'loan';
+  const fee = (tr.fee || '').toLowerCase();
+  if (fee.includes('free') || fee === '£0' || fee === '€0') return 'free';
+  if (['talks','interest','advanced_talks'].includes(tr.status)) return 'rumour';
+  return 'permanent';
+}
+
+function typeBadge(tr) {
+  const type = inferType(tr);
+  const labels = {loan:'type_loan',free:'type_free',rumour:'type_rumour',permanent:'type_permanent'};
+  const cls    = {loan:'b-loan',free:'b-free',rumour:'b-rumour',permanent:'b-permanent'};
+  return `<span class="badge ${cls[type]}">${t(labels[type])}</span>`;
+}
+
+const STATUS_MAP = {
+  confirmed:'confirmed',agreement:'agreement',advanced_talks:'adv_talks',
+  talks:'talks',interest:'interest',loan:'loan',rejected:'rejected',cancelled:'cancelled',
+};
+const STATUS_CLS = {
+  confirmed:'b-confirmed',agreement:'b-agreement',advanced_talks:'b-adv-talks',
+  talks:'b-talks',interest:'b-interest',loan:'b-loan',
+  rejected:'b-rejected',cancelled:'b-cancelled',
+};
+function statusBadge(status) {
+  const lbl = STATUS_MAP[status] ? t(STATUS_MAP[status]) : (status || '—');
+  const cls = STATUS_CLS[status] || 'b-default';
+  return `<span class="badge ${cls}"><span class="badge-dot" style="background:currentColor"></span>${esc(lbl)}</span>`;
+}
+
+function confColor(v) {
+  if (v >= .85) return 'var(--green)';
+  if (v >= .60) return 'var(--blue)';
+  if (v >= .40) return 'var(--orange)';
+  return 'var(--purple)';
+}
+
+// ══════════════════════════════════════════════
+// PAGE / FILTER STATE
+// ══════════════════════════════════════════════
+let allTransfers = [];
+let activePage   = 'all';
+
+const PAGE_FILTER = {
+  all:       ()  => true,
+  confirmed: tr  => ['confirmed','agreement'].includes(tr.status),
+  rumours:   tr  => ['talks','interest','advanced_talks'].includes(tr.status),
+  loans:     tr  => tr.status === 'loan' || inferType(tr) === 'loan',
+};
+
+function getFiltered() {
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const status = document.getElementById('statusFilter').value;
+  const sort   = document.getElementById('sortSelect').value;
+
+  let list = allTransfers.filter(tr => {
+    if (!PAGE_FILTER[activePage](tr)) return false;
+    if (status && tr.status !== status) return false;
+    if (search) {
+      const hay = `${tr.player} ${tr.player_ar||''} ${tr.from_club} ${tr.from_club_ar||''} ${tr.to_club} ${tr.to_club_ar||''}`.toLowerCase();
+      if (!hay.includes(search)) return false;
+    }
+    return true;
+  });
+
+  if (sort === 'confidence') list = [...list].sort((a,b) => (b.confidence??0)-(a.confidence??0));
+  else if (sort === 'votes') list = [...list].sort((a,b) =>
+    ((b.yes_count||0)+(b.no_count||0)) - ((a.yes_count||0)+(a.no_count||0))
+  );
+  return list;
+}
+
+function updateTabCounts() {
+  document.getElementById('cnt-all').textContent       = allTransfers.length;
+  document.getElementById('cnt-confirmed').textContent = allTransfers.filter(PAGE_FILTER.confirmed).length;
+  document.getElementById('cnt-rumours').textContent   = allTransfers.filter(PAGE_FILTER.rumours).length;
+  document.getElementById('cnt-loans').textContent     = allTransfers.filter(PAGE_FILTER.loans).length;
+}
+
+// ══════════════════════════════════════════════
+// COUNTRY FLAG MAP
+// ══════════════════════════════════════════════
+const COUNTRY_FLAG = {
+  england:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', scotland:'🏴󠁧󠁢󠁳󠁣󠁴󠁿', wales:'🏴󠁧󠁢󠁷󠁬󠁳󠁿',
+  germany:'🇩🇪', spain:'🇪🇸', france:'🇫🇷', italy:'🇮🇹',
+  portugal:'🇵🇹', netherlands:'🇳🇱', belgium:'🇧🇪',
+  brazil:'🇧🇷', argentina:'🇦🇷', usa:'🇺🇸',
+  'saudi arabia':'🇸🇦', turkey:'🇹🇷', greece:'🇬🇷',
+  russia:'🇷🇺', japan:'🇯🇵', china:'🇨🇳', australia:'🇦🇺',
+  austria:'🇦🇹', switzerland:'🇨🇭', denmark:'🇩🇰', sweden:'🇸🇪',
+  norway:'🇳🇴', poland:'🇵🇱', ukraine:'🇺🇦', croatia:'🇭🇷',
+  serbia:'🇷🇸', czechia:'🇨🇿', slovakia:'🇸🇰', hungary:'🇭🇺',
+  romania:'🇷🇴', bulgaria:'🇧🇬', mexico:'🇲🇽', colombia:'🇨🇴',
+  uruguay:'🇺🇾', chile:'🇨🇱', 'south korea':'🇰🇷', iran:'🇮🇷',
+  morocco:'🇲🇦', egypt:'🇪🇬', nigeria:'🇳🇬', ghana:'🇬🇭',
+  'united arab emirates':'🇦🇪', qatar:'🇶🇦', china:'🇨🇳',
+};
+
+function countryFlag(country) {
+  if (!country) return '';
+  return COUNTRY_FLAG[(country||'').toLowerCase()] || '🌍';
+}
+
+function playerInitials(name) {
+  const parts = (name || '').trim().split(/\s+/);
+  if (parts.length >= 2) return (parts[0][0] + parts[parts.length-1][0]).toUpperCase();
+  return (name || '?').slice(0,2).toUpperCase();
+}
+
+// ══════════════════════════════════════════════
+// RENDER TRANSFER CARD
+// ══════════════════════════════════════════════
+function renderCard(tr, isNew = false) {
+  const ar      = lang === 'ar';
+  const player  = (ar && tr.player_ar)    || tr.player;
+  const fromRaw = (ar && tr.from_club_ar) || tr.from_club;
+  const toRaw   = (ar && tr.to_club_ar)   || tr.to_club;
+  const from    = fromRaw || t('unknown');
+  const to      = toRaw   || t('unknown');
+  const fa      = clubAv(tr.from_club);
+  const ta      = clubAv(tr.to_club);
+  const conf    = tr.confidence ?? 0;
+  const ids     = JSON.parse(tr.tweet_ids || '[]');
+  const tweets  = JSON.parse(tr.raw_tweets || '[]');
+  const preview = (ar && tr.tweet_preview_ar) || tweets[0] || '';
+
+  const fFlag   = countryFlag(tr.from_club_country);
+  const tFlag   = countryFlag(tr.to_club_country);
+
+  const yes = tr.yes_count || 0;
+  const no  = tr.no_count  || 0;
+  const tot = yes + no;
+  const yesPct = tot ? Math.round((yes/tot)*100) : 0;
+  const noPct  = tot ? Math.round((no/tot)*100)  : 0;
+
+  const userVote = localStorage.getItem(`vote_${tr.id}`);
+  const voted    = !!userVote;
+
+  const photoHtml = tr.photo_url
+    ? `<img src="${esc(tr.photo_url)}" alt="${esc(player)}"
+            onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+    : '';
+  const initialsStyle = tr.photo_url ? 'display:none' : 'display:flex';
+
+  // Build back-face tweet list
+  const tweetItems = ids.map((tid, i) => {
+    const txt    = tweets[i] || '';
+    const isUrl  = tid.startsWith('http');
+    const date   = isUrl ? null : snowflakeDate(tid);
+    const locale = lang === 'ar' ? 'ar-SA' : 'en-GB';
+    const time   = date ? date.toLocaleString(locale,{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
+    const url    = isUrl ? tid : `https://x.com/FabrizioRomano/status/${tid}`;
+    const icon   = isUrl ? '📰' : '🐦';
+    return `<a class="tweet-item" href="${url}" target="_blank" rel="noopener"
+               onclick="event.stopPropagation()">
+      <div class="tweet-item-text">${esc(txt)}</div>
+      <div class="tweet-item-meta">
+        ${time ? `<span>🕐 ${esc(time)}</span>` : `<span>${icon}</span>`}
+        <span class="tweet-item-link">${t('open_tweet')}</span>
+      </div>
+    </a>`;
+  }).join('');
+
+  return `
+<div class="t-card ${isNew?'new':''}" data-id="${tr.id}" onclick="flipCard(this)">
+<div class="card-inner">
+
+  <!-- ═══ FRONT ═══ -->
+  <div class="card-front">
+
+    <div class="card-topbar">
+      ${statusBadge(tr.status)}
+      ${typeBadge(tr)}
+      <div class="source-tag">📰 ${esc(tr.news_source || t('source'))} · ${ids.length} 📨</div>
+    </div>
+
+    <div class="card-main">
+      <div class="player-info">
+        <div class="player-photo-wrap">
+          ${photoHtml}
+          <div class="player-initials" style="${initialsStyle}">${playerInitials(tr.player)}</div>
+          ${tr.player_country ? `<span class="player-flag-badge">${countryFlag(tr.player_country)}</span>` : ''}
+        </div>
+        <div class="player-name">${esc(player)}</div>
+      </div>
+      <div class="card-sep"></div>
+      <div class="clubs-inline">
+        <div class="club-inline">
+          <span class="club-flag">${fFlag}</span>
+          <span class="club-inline-name" title="${esc(from)}">${esc(from)}</span>
+        </div>
+        <span class="arrow-icon">→</span>
+        ${tr.fee ? `<span class="fee-pill">${esc(tr.fee)}</span>` : ''}
+        <div class="club-inline">
+          <span class="club-flag">${tFlag}</span>
+          <span class="club-inline-name" title="${esc(to)}">${esc(to)}</span>
+        </div>
+      </div>
+    </div>
+
+    ${preview ? `<div class="tweet-preview" style="margin-bottom:12px">${esc(preview.slice(0,180))}${preview.length>180?'…':''}</div>` : ''}
+
+    <div class="card-footer">
+      <span>🕐 ${timeAgo(tr.updated_at)}</span>
+      <button class="share-btn" title="${lang==='ar'?'مشاركة':'Share'}" onclick="event.stopPropagation();shareCard(${tr.id},this)">🔗</button>
+      <button class="comment-btn" onclick="event.stopPropagation();openComments(${tr.id})">
+        💬 <span class="cmt-count">${tr.comment_count || 0}</span>
+      </button>
+      <span class="footer-sep"></span>
+      <div class="conf-row">
+        <div class="conf-track">
+          <div class="conf-fill" style="width:${Math.round(conf*100)}%;background:${confColor(conf)}"></div>
+        </div>
+        <span class="conf-pct">${t('conf_lbl')} ${Math.round(conf*100)}%</span>
+      </div>
+    </div>
+
+    ${['confirmed','agreement'].includes(tr.status) ? '' : `
+    <div class="prediction" onclick="event.stopPropagation()">
+      <div class="pred-title">${t('pred_title')}</div>
+      <div class="pred-btns">
+        <button class="pred-btn yes ${userVote==='yes'?'voted-yes':''}"
+          onclick="event.stopPropagation();castVote(${tr.id},'yes',this)" ${voted?'disabled':''}>
+          ${t('vote_yes')} ${tot?`<span>(${yesPct}%)</span>`:''}
+        </button>
+        <button class="pred-btn no ${userVote==='no'?'voted-no':''}"
+          onclick="event.stopPropagation();castVote(${tr.id},'no',this)" ${voted?'disabled':''}>
+          ${t('vote_no')} ${tot?`<span>(${noPct}%)</span>`:''}
+        </button>
+      </div>
+      <div class="pred-bar-wrap">
+        <span style="color:var(--green);font-weight:700">${yesPct}%</span>
+        <div class="pred-bar">
+          <div class="pred-bar-yes" style="width:${yesPct}%"></div>
+          <div class="pred-bar-no"  style="width:${noPct}%"></div>
+        </div>
+        <span style="color:var(--red);font-weight:700">${noPct}%</span>
+      </div>
+      <div class="pred-votes">${tot ? tf('votes_count',tot) : t('votes_none')}</div>
+    </div>`}
+
+  </div><!-- /card-front -->
+
+  <!-- ═══ BACK ═══ -->
+  <div class="card-back">
+    <div class="card-back-header">
+      <span>📨 ${ids.length} ${ids.length===1?t('tw_single'):t('tw_plural')} · ${esc(player)}</span>
+      <button class="flip-close" onclick="event.stopPropagation();flipCard(this.closest('.t-card'))">✕</button>
+    </div>
+    <div class="tweet-list">
+      ${tweetItems || `<div style="padding:20px;text-align:center;color:var(--txt3)">—</div>`}
+    </div>
+  </div><!-- /card-back -->
+
+</div><!-- /card-inner -->
+</div>`;
+}
+
+// ══════════════════════════════════════════════
+// MAIN RENDER
+// ══════════════════════════════════════════════
+function renderAll(flash = null) {
+  const list = getFiltered();
+  document.getElementById('resultCount').textContent = tf('results', list.length);
+
+  const col = document.getElementById('cardsCol');
+  if (!list.length) {
+    col.innerHTML = `<div class="empty"><div class="empty-icon">🔍</div><p>${t('no_transfers')}</p></div>`;
+    return;
+  }
+
+  col.innerHTML = list.map(tr => renderCard(tr, tr.id === flash)).join('');
+  updateTabCounts();
+}
+
+function loadStats() {
+  fetch('/api/stats').then(r=>r.json()).then(s => {
+    document.getElementById('sTotal').textContent  = s.total;
+    document.getElementById('sConf').textContent   = s.confirmed;
+    document.getElementById('sTweets').textContent = s.tweets;
+  });
+}
+
+// ══════════════════════════════════════════════
+// VOTING
+// ══════════════════════════════════════════════
+async function castVote(id, choice, btn) {
+  if (localStorage.getItem(`vote_${id}`)) return;
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(`/api/transfers/${id}/vote`, {
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ choice }),
+    });
+    const pred = await res.json();
+
+    // Update this transfer's votes in state
+    const tr = allTransfers.find(t => t.id === id);
+    if (tr) { tr.yes_count = pred.yes_count; tr.no_count = pred.no_count; }
+
+    localStorage.setItem(`vote_${id}`, choice);
+
+    // Re-render just this card
+    const card = document.querySelector(`.t-card[data-id="${id}"]`);
+    if (card) card.outerHTML = renderCard(tr || {id,...pred}, false);
+  } catch {
+    btn.disabled = false;
+  }
+}
+
+// ══════════════════════════════════════════════
+// SHARE
+// ══════════════════════════════════════════════
+async function shareCard(id, btn) {
+  const tr = allTransfers.find(t => t.id === id);
+  if (!tr) return;
+
+  btn.classList.add('loading');
+  btn.textContent = '⏳';
+
+  try {
+    await document.fonts.ready;
+
+    const ar       = lang === 'ar';
+    const isDark   = theme === 'dark';
+    const player   = (ar && tr.player_ar)    || tr.player   || '';
+    const fromName = (ar && tr.from_club_ar) || tr.from_club || '—';
+    const toName   = (ar && tr.to_club_ar)   || tr.to_club   || '—';
+    const natFlag  = countryFlag(tr.player_country) || '';
+    const fFlag    = countryFlag(tr.from_club_country) || '🌍';
+    const tFlag    = countryFlag(tr.to_club_country)   || '🌍';
+
+    const W = 600, H = 300, S = 2;
+    const cv  = document.createElement('canvas');
+    cv.width  = W * S;
+    cv.height = H * S;
+    const ctx = cv.getContext('2d');
+    ctx.scale(S, S);
+
+    // ── Palette ──────────────────────────────────
+    const BG   = isDark ? '#0d1424' : '#f1f5f9';
+    const SUR  = isDark ? '#111827' : '#ffffff';
+    const BRD  = isDark ? '#1e2d42' : '#e2e8f0';
+    const TXT  = isDark ? '#e2eaf5' : '#0f172a';
+    const TXT3 = isDark ? '#64748b' : '#94a3b8';
+    const BLUE = '#3b82f6';
+    const FONT = ar ? '"Tajawal", sans-serif' : '"Inter", sans-serif';
+
+    function rr(x,y,w,h,r){
+      ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);
+      ctx.arcTo(x+w,y,x+w,y+r,r);ctx.lineTo(x+w,y+h-r);
+      ctx.arcTo(x+w,y+h,x+w-r,y+h,r);ctx.lineTo(x+r,y+h);
+      ctx.arcTo(x,y+h,x,y+h-r,r);ctx.lineTo(x,y+r);
+      ctx.arcTo(x,y,x+r,y,r);ctx.closePath();
+    }
+
+    // ── Background ────────────────────────────────
+    ctx.fillStyle = BG;
+    rr(0,0,W,H,20); ctx.fill();
+
+    // Top gradient bar
+    const grd = ctx.createLinearGradient(0,0,W,0);
+    grd.addColorStop(0,'#3b82f6');grd.addColorStop(1,'#a855f7');
+    ctx.fillStyle = grd; ctx.fillRect(0,0,W,4);
+
+    // ── Brand ─────────────────────────────────────
+    ctx.direction = 'ltr'; ctx.textAlign = 'left';
+    ctx.font = `700 12px ${FONT}`; ctx.fillStyle = TXT3;
+    ctx.fillText('⚽ TransferWatch', 24, 30);
+
+    // ── Player Photo ──────────────────────────────
+    const PR = 38;
+    const PX = ar ? W - 24 - PR : 24 + PR;
+    const PY = 60 + PR;
+
+    ctx.save();
+    ctx.beginPath(); ctx.arc(PX, PY, PR, 0, Math.PI*2); ctx.clip();
+    let photoLoaded = false;
+    if (tr.photo_url) {
+      try {
+        const img = new Image(); img.crossOrigin = 'anonymous';
+        await new Promise((res,rej) => { img.onload=res; img.onerror=rej; img.src=tr.photo_url; });
+        ctx.drawImage(img, PX-PR, PY-PR, PR*2, PR*2);
+        photoLoaded = true;
+      } catch {}
+    }
+    if (!photoLoaded) {
+      ctx.fillStyle = isDark ? '#1f2a40' : '#dde5f0'; ctx.fill();
+      ctx.fillStyle = TXT3;
+      ctx.font = `700 18px ${FONT}`; ctx.textAlign='center'; ctx.direction='ltr';
+      ctx.fillText(playerInitials(tr.player), PX, PY+6);
+    }
+    ctx.restore();
+    ctx.strokeStyle = BRD; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(PX,PY,PR,0,Math.PI*2); ctx.stroke();
+
+    // ── Player Name ───────────────────────────────
+    const nameX = ar ? PX - PR - 18 : PX + PR + 18;
+    ctx.direction = ar ? 'rtl' : 'ltr';
+    ctx.textAlign = ar ? 'right' : 'left';
+    ctx.font = `800 24px ${FONT}`; ctx.fillStyle = TXT;
+    ctx.fillText(player, nameX, PY - 8);
+
+    // Nationality flag + line
+    ctx.font = '20px sans-serif';
+    ctx.fillText(natFlag, nameX, PY + 22);
+
+    // ── Transfer Box ──────────────────────────────
+    const BX=24, BY=178, BW=W-48, BH=68;
+    ctx.fillStyle = SUR; ctx.strokeStyle = BRD; ctx.lineWidth = 1;
+    rr(BX,BY,BW,BH,14); ctx.fill(); ctx.stroke();
+
+    const midX = BX + BW/2;
+    const textY = BY + BH/2 + 6;
+
+    // Arrow
+    ctx.font = `700 20px ${FONT}`; ctx.fillStyle = BLUE;
+    ctx.textAlign = 'center'; ctx.direction = 'ltr';
+    ctx.fillText(ar ? '←' : '→', midX, textY);
+
+    // FROM flag + name (left side in LTR, right side in RTL)
+    const gap = 12;
+    ctx.font = '20px sans-serif'; ctx.direction = 'ltr';
+    if (ar) {
+      ctx.textAlign = 'right';
+      ctx.fillText(fFlag, BX+BW-gap, textY);
+      ctx.font = `600 13px ${FONT}`; ctx.fillStyle = TXT;
+      ctx.fillText(fromName, BX+BW-gap-28, textY);
+    } else {
+      ctx.textAlign = 'left';
+      ctx.fillText(fFlag, BX+gap, textY);
+      ctx.font = `600 13px ${FONT}`; ctx.fillStyle = TXT;
+      ctx.textAlign = 'left'; ctx.direction = 'ltr';
+      ctx.fillText(fromName, BX+gap+28, textY);
+    }
+
+    // TO flag + name
+    ctx.font = '20px sans-serif'; ctx.fillStyle = TXT; ctx.direction = 'ltr';
+    if (ar) {
+      ctx.textAlign = 'left';
+      ctx.fillText(tFlag, BX+gap, textY);
+      ctx.font = `600 13px ${FONT}`; ctx.fillStyle = TXT;
+      ctx.textAlign = 'left'; ctx.direction = 'ltr';
+      ctx.fillText(toName, BX+gap+28, textY);
+    } else {
+      ctx.textAlign = 'right';
+      ctx.fillText(tFlag, BX+BW-gap, textY);
+      ctx.font = `600 13px ${FONT}`; ctx.fillStyle = TXT;
+      ctx.textAlign = 'right'; ctx.direction = 'ltr';
+      ctx.fillText(toName, BX+BW-gap-28, textY);
+    }
+
+    // ── Footer ────────────────────────────────────
+    ctx.font = `400 11px ${FONT}`; ctx.fillStyle = TXT3;
+    ctx.textAlign = 'center'; ctx.direction = 'ltr';
+    ctx.fillText('transferwatch.live', W/2, H-14);
+
+    // ── Share / Download ──────────────────────────
+    const fname = `${player.replace(/\s+/g,'-') || 'transfer'}.png`;
+    cv.toBlob(async blob => {
+      const file = new File([blob], fname, { type:'image/png' });
+      if (navigator.share && navigator.canShare?.({ files:[file] })) {
+        await navigator.share({ files:[file], title:player });
+      } else {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href=url; a.download=fname; a.click();
+        setTimeout(()=>URL.revokeObjectURL(url), 2000);
+      }
+    }, 'image/png');
+
+  } catch(e) {
+    console.warn('share failed', e);
+  } finally {
+    btn.classList.remove('loading');
+    btn.textContent = '🔗';
+  }
+}
+
+// ══════════════════════════════════════════════
+// COMMENTS
+// ══════════════════════════════════════════════
+let currentCmtId = null;
+
+const AVATAR_COLORS = ['#3b82f6','#22c55e','#a855f7','#f59e0b','#ef4444','#06b6d4','#ec4899'];
+function avatarColor(name) {
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) & 0xffffffff;
+  return AVATAR_COLORS[Math.abs(h) % AVATAR_COLORS.length];
+}
+function avatarInitials(name) {
+  const p = name.trim().split(/\s+/);
+  return p.length >= 2 ? (p[0][0] + p[p.length-1][0]).toUpperCase() : name.slice(0,2).toUpperCase();
+}
+function cmtTimeAgo(str) {
+  const d = new Date(str.includes('T') ? str : str.replace(' ','T') + 'Z');
+  const s = Math.floor((Date.now() - d) / 1000);
+  if (s < 60)  return t('just_now');
+  if (s < 3600) return tf('min_ago', Math.floor(s/60));
+  if (s < 86400) return tf('hr_ago', Math.floor(s/3600));
+  return tf('day_ago', Math.floor(s/86400));
+}
+
+function renderComments(comments) {
+  const list = document.getElementById('cmtList');
+  if (!comments.length) {
+    list.innerHTML = `<div class="cmt-empty"><div class="cmt-empty-icon">💬</div><span>${t('cmt_empty')}</span></div>`;
+    return;
+  }
+  list.innerHTML = comments.map(c => {
+    const name  = c.nickname || t('cmt_anon');
+    const color = avatarColor(name);
+    const ini   = avatarInitials(name);
+    return `<div class="cmt-item">
+      <div class="cmt-avatar" style="background:${color}">${ini}</div>
+      <div class="cmt-body">
+        <div class="cmt-meta">
+          <span class="cmt-name">${esc(name)}</span>
+          <span class="cmt-time">${cmtTimeAgo(c.created_at)}</span>
+        </div>
+        <div class="cmt-text">${esc(c.body)}</div>
+      </div>
+    </div>`;
+  }).join('');
+  list.scrollTop = list.scrollHeight;
+}
+
+async function openComments(id) {
+  currentCmtId = id;
+  const tr = allTransfers.find(t => t.id === id);
+  const ar = lang === 'ar';
+
+  document.getElementById('cmtPlayer').textContent =
+    (ar && tr?.player_ar) || tr?.player || '';
+  const from = (ar && tr?.from_club_ar) || tr?.from_club || t('unknown');
+  const to   = (ar && tr?.to_club_ar)   || tr?.to_club   || t('unknown');
+  document.getElementById('cmtClubs').textContent = `${from} → ${to}`;
+
+  document.getElementById('cmtName').placeholder  = t('cmt_name_ph');
+  document.getElementById('cmtBody').placeholder  = t('cmt_placeholder');
+  document.getElementById('cmtSubmit').textContent = t('cmt_submit');
+
+  document.getElementById('cmtList').innerHTML = '';
+  document.getElementById('cmtOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+
+  try {
+    const res = await fetch(`/api/transfers/${id}/comments`);
+    renderComments(await res.json());
+  } catch { /* silent */ }
+}
+
+function closeComments() {
+  document.getElementById('cmtOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+  currentCmtId = null;
+}
+
+function handleOverlayClick(e) {
+  if (e.target === document.getElementById('cmtOverlay')) closeComments();
+}
+
+async function submitComment() {
+  if (!currentCmtId) return;
+  const body = document.getElementById('cmtBody').value.trim();
+  if (!body) return;
+  const nickname = document.getElementById('cmtName').value.trim();
+  const btn = document.getElementById('cmtSubmit');
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(`/api/transfers/${currentCmtId}/comments`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ nickname, body }),
+    });
+    if (!res.ok) throw new Error();
+    document.getElementById('cmtBody').value = '';
+
+    // Reload comments
+    const r2 = await fetch(`/api/transfers/${currentCmtId}/comments`);
+    const comments = await r2.json();
+    renderComments(comments);
+
+    // Update count in state + card
+    const tr = allTransfers.find(t => t.id === currentCmtId);
+    if (tr) {
+      tr.comment_count = comments.length;
+      const card = document.querySelector(`.t-card[data-id="${currentCmtId}"]`);
+      if (card) {
+        const countEl = card.querySelector('.cmt-count');
+        if (countEl) countEl.textContent = comments.length;
+      }
+    }
+  } catch { /* silent */ } finally {
+    btn.disabled = false;
+  }
+}
+
+// Allow Enter to submit (Shift+Enter for newline)
+document.getElementById('cmtBody').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submitComment(); }
+});
+
+// Close on Escape
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeComments(); });
+
+// ══════════════════════════════════════════════
+// NAV TABS
+// ══════════════════════════════════════════════
+document.getElementById('navTabs').addEventListener('click', e => {
+  const tab = e.target.closest('.nav-tab');
+  if (!tab) return;
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+  activePage = tab.dataset.page;
+  renderAll();
+});
+
+['searchInput','statusFilter','sortSelect'].forEach(id => {
+  document.getElementById(id).addEventListener('input', () => renderAll());
+});
+
+// ══════════════════════════════════════════════
+// SSE
+// ══════════════════════════════════════════════
+function connect() {
+  const es  = new EventSource('/api/feed');
+  const dot = document.getElementById('liveDot');
+  const st  = document.getElementById('liveStatus');
+
+  es.addEventListener('snapshot', e => {
+    allTransfers = JSON.parse(e.data);
+    dot.classList.add('on');
+    st.textContent = `${t('live')} · ${new Date().toLocaleTimeString(lang==='ar'?'ar-SA':'en-GB')}`;
+    updateTabCounts();
+    renderAll();
+    loadStats();
+  });
+
+  es.addEventListener('transfer', e => {
+    const tr  = JSON.parse(e.data);
+    const idx = allTransfers.findIndex(x => x.id === tr.id);
+    if (idx >= 0) allTransfers[idx] = tr; else allTransfers.unshift(tr);
+    updateTabCounts();
+    renderAll(tr.id);
+    loadStats();
+    loadTweets();
+    st.textContent = `${t('updated')} · ${new Date().toLocaleTimeString(lang==='ar'?'ar-SA':'en-GB')}`;
+  });
+
+  es.onerror = () => {
+    dot.classList.remove('on');
+    st.textContent = t('connecting');
+    es.close();
+    setTimeout(connect, 3000);
+  };
+}
+
+// ══════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════
+applyTheme();
+applyLang();
+connect();
+</script>
+</body>
+</html>
