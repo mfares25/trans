@@ -6,6 +6,7 @@ import { resolveUserId } from './twitter.js';
 import { router as apiRouter } from './api.js';
 import { setUserId, startCron } from './cron.js';
 import { translatePending } from './translate.js';
+import { logUpdate } from './updateLog.js';
 
 // ── env validation ────────────────────────────────────────────────────────────
 
@@ -51,7 +52,10 @@ async function main() {
   app.listen(PORT, async () => {
     console.log(`[http] Listening on http://localhost:${PORT}`);
     startCron();
-    if (process.env.POLL_DISABLED !== 'true') await translatePending();
+    if (process.env.POLL_DISABLED !== 'true') {
+      const translatedCount = await translatePending();
+      logUpdate(0, translatedCount);
+    }
   });
 }
 

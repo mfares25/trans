@@ -860,12 +860,16 @@ const PAGE_FILTER = {
   loans:     tr  => tr.status === 'loan' || inferType(tr) === 'loan',
 };
 
+function visibleTransfers() {
+  return lang === 'ar' ? allTransfers.filter(tr => tr.player_ar) : allTransfers;
+}
+
 function getFiltered() {
   const search = document.getElementById('searchInput').value.toLowerCase();
   const status = document.getElementById('statusFilter').value;
   const sort   = document.getElementById('sortSelect').value;
 
-  let list = allTransfers.filter(tr => {
+  let list = visibleTransfers().filter(tr => {
     if (!PAGE_FILTER[activePage](tr)) return false;
     if (status && tr.status !== status) return false;
     if (search) {
@@ -883,10 +887,11 @@ function getFiltered() {
 }
 
 function updateTabCounts() {
-  document.getElementById('cnt-all').textContent       = allTransfers.length;
-  document.getElementById('cnt-confirmed').textContent = allTransfers.filter(PAGE_FILTER.confirmed).length;
-  document.getElementById('cnt-rumours').textContent   = allTransfers.filter(PAGE_FILTER.rumours).length;
-  document.getElementById('cnt-loans').textContent     = allTransfers.filter(PAGE_FILTER.loans).length;
+  const base = visibleTransfers();
+  document.getElementById('cnt-all').textContent       = base.length;
+  document.getElementById('cnt-confirmed').textContent = base.filter(PAGE_FILTER.confirmed).length;
+  document.getElementById('cnt-rumours').textContent   = base.filter(PAGE_FILTER.rumours).length;
+  document.getElementById('cnt-loans').textContent     = base.filter(PAGE_FILTER.loans).length;
 }
 
 // ══════════════════════════════════════════════

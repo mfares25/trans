@@ -4,8 +4,10 @@ import { extractTransferData } from './claude.js';
 import { getSinceId, setSinceId, upsertTransfer, logTweet, isTweetLogged } from './db.js';
 import { broadcast } from './api.js';
 import { translatePending } from './translate.js';
+import { logUpdate } from './updateLog.js';
 
 let userId = null;
+let pollInProgress = false;
 
 export function setUserId(id) {
   userId = id;
@@ -14,6 +16,19 @@ export function setUserId(id) {
 export async function pollOnce() {
   if (!userId) throw new Error('User ID not set — call setUserId() first');
 
+  if (pollInProgress) {
+    console.log('[poll] Previous poll still running — skipping this cycle');
+    return;
+  }
+  pollInProgress = true;
+  try {
+    await pollOnceInner();
+  } finally {
+    pollInProgress = false;
+  }
+}
+
+async function pollOnceInner() {
   console.log(`[poll] ${new Date().toISOString()} — fetching tweets for user ${userId}`);
 
   const sinceId = getSinceId();
@@ -41,6 +56,8 @@ export async function pollOnce() {
   const twitterItems = tweets.filter(t => /^\d+$/.test(t.id));
   if (twitterItems.length) setSinceId(twitterItems.at(-1).id);
 
+  let addedCount = 0;
+
   for (const tweet of tweets) {
     if (isTweetLogged(tweet.id)) continue;
 
@@ -63,6 +80,8 @@ export async function pollOnce() {
 
     logTweet(tweet.id, tweet.text, transfer.id, true);
 
+    if (transfer._action === 'created') addedCount++;
+
     const arrow = `${extracted.from_club ?? '?'} → ${extracted.to_club ?? '?'}`;
     console.log(`[poll]   ${transfer._action}: ${extracted.player} | ${arrow} | ${extracted.status} (${extracted.confidence})`);
 
@@ -70,7 +89,8 @@ export async function pollOnce() {
   }
 
   // Translate any newly added transfers to Arabic
-  await translatePending();
+  const translatedCount = await translatePending();
+  logUpdate(addedCount, translatedCount);
 }
 
 export function startCron() {

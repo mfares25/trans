@@ -1,6 +1,7 @@
 import axios from 'axios';
-import { getUntranslated, saveTranslation, updateFromClub } from './db.js';
+import { getUntranslated, saveTranslation, updateFromClub, getTransferById } from './db.js';
 import { askClaude } from './claudeCli.js';
+import { broadcast } from './api.js';
 
 const SYSTEM = `You are a football data assistant.
 Given transfer data, return ONLY a valid JSON object with these fields:
@@ -100,11 +101,25 @@ async function translateOne(tr) {
   return { ...result, photo_url };
 }
 
+let translateInProgress = false;
+
 export async function translatePending() {
+  if (translateInProgress) return 0;
+  translateInProgress = true;
+  try {
+    return await translatePendingInner();
+  } finally {
+    translateInProgress = false;
+  }
+}
+
+async function translatePendingInner() {
   const pending = getUntranslated();
-  if (!pending.length) return;
+  if (!pending.length) return 0;
 
   console.log(`[translate] ${pending.length} transfer(s) to process`);
+
+  let translatedCount = 0;
 
   for (const tr of pending) {
     try {
@@ -122,6 +137,8 @@ export async function translatePending() {
 
       const result = await translateOne(tr);
       saveTranslation(tr.id, result);
+      broadcast('transfer', getTransferById(tr.id));
+      translatedCount++;
       const photo = result.photo_url ? '📷' : '—';
       console.log(`[translate] ✓ ${tr.player} → ${result.player_ar} | ${result.from_club_country} → ${result.to_club_country} ${photo}`);
     } catch (err) {
@@ -130,4 +147,5 @@ export async function translatePending() {
   }
 
   console.log('[translate] Done.');
+  return translatedCount;
 }
