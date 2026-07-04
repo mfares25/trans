@@ -5,7 +5,7 @@ import { dirname, join } from 'path';
 import { resolveUserId } from './twitter.js';
 import { router as apiRouter } from './api.js';
 import { setUserId, startCron } from './cron.js';
-import { translatePending } from './translate.js';
+import { translatePending, backfillPlayerCountries } from './translate.js';
 import { logUpdate } from './updateLog.js';
 
 // ── env validation ────────────────────────────────────────────────────────────
@@ -54,6 +54,7 @@ async function main() {
     startCron();
     if (process.env.POLL_DISABLED !== 'true') {
       const translatedCount = await translatePending();
+      await backfillPlayerCountries();
       logUpdate(0, translatedCount);
     }
   });

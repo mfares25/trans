@@ -155,17 +155,17 @@ html[data-tsize="2"] body{zoom:1.25}
   flex-shrink:0;
 }
 .search-wrap{
-  position:relative;flex:1;min-width:180px;max-width:280px;
+  position:relative;flex:1;min-width:200px;max-width:340px;
 }
 .search-icon{
-  position:absolute;inset-inline-start:11px;top:50%;
-  transform:translateY(-50%);color:var(--txt3);font-size:19px;
+  position:absolute;left:11px;top:50%;
+  transform:translateY(-50%);color:var(--txt3);font-size:17px;
   pointer-events:none;
 }
 .search-input{
   width:100%;background:var(--sur2);border:1px solid var(--brd);
   border-radius:var(--radius-sm);padding:7px 10px 7px 34px;
-  font-size:19px;transition:border-color .2s;color:var(--txt);
+  font-size:15px;transition:border-color .2s;color:var(--txt);
 }
 .search-input:focus{border-color:var(--blue)}
 .filter-select{
@@ -250,12 +250,10 @@ html[data-tsize="2"] body{zoom:1.25}
 .flip-close:hover{background:var(--brd)}
 .tweet-list{overflow-y:auto;max-height:320px}
 .tweet-item{
-  display:block;text-decoration:none;color:inherit;
+  display:block;
   padding:10px 14px;border-bottom:1px solid var(--brd);
-  transition:background .15s;
 }
 .tweet-item:last-child{border-bottom:none}
-.tweet-item:hover{background:var(--sur2)}
 .tweet-item-text{
   font-size:17px;color:var(--txt);line-height:1.6;margin-bottom:5px;
   display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
@@ -264,7 +262,8 @@ html[data-tsize="2"] body{zoom:1.25}
   display:flex;align-items:center;justify-content:space-between;
   font-size:14px;color:var(--txt3);
 }
-.tweet-item-link{color:var(--blue);font-weight:600}
+.tweet-item-link{color:var(--blue);font-weight:600;text-decoration:none;cursor:pointer}
+.tweet-item-link:hover{text-decoration:underline}
 
 /* top bar: badges + source */
 .card-topbar{
@@ -1032,14 +1031,14 @@ function renderCard(tr, isNew = false) {
     const time   = date ? date.toLocaleString(locale,{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
     const url    = isUrl ? tid : `https://x.com/FabrizioRomano/status/${tid}`;
     const icon   = isUrl ? '📰' : '🐦';
-    return `<a class="tweet-item" href="${url}" target="_blank" rel="noopener"
-               onclick="event.stopPropagation()">
+    return `<div class="tweet-item">
       <div class="tweet-item-text">${esc(txt)}</div>
       <div class="tweet-item-meta">
         ${time ? `<span>🕐 ${esc(time)}</span>` : `<span>${icon}</span>`}
-        <span class="tweet-item-link">${t('open_tweet')}</span>
+        <a class="tweet-item-link" href="${url}" target="_blank" rel="noopener"
+           onclick="event.stopPropagation()">${t('open_tweet')}</a>
       </div>
-    </a>`;
+    </div>`;
   }).join('');
 
   return `

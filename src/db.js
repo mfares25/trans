@@ -9,7 +9,7 @@ db.exec('PRAGMA journal_mode = WAL');
 
 // Add Arabic columns if they don't exist yet (safe on existing DBs)
 ['player_ar','from_club_ar','to_club_ar','tweet_preview_ar',
- 'photo_url','from_club_country','to_club_country','news_source'].forEach(col => {
+ 'photo_url','from_club_country','to_club_country','news_source','player_country'].forEach(col => {
   try { db.exec(`ALTER TABLE transfers ADD COLUMN ${col} TEXT`); } catch {}
 });
 
@@ -230,15 +230,25 @@ export function getUntranslated() {
 
 export function saveTranslation(id, data) {
   const { player_ar, from_club_ar, to_club_ar, tweet_preview_ar,
-          photo_url, from_club_country, to_club_country } = data;
+          photo_url, from_club_country, to_club_country, player_country } = data;
   db.prepare(`
     UPDATE transfers
        SET player_ar = ?, from_club_ar = ?, to_club_ar = ?,
            tweet_preview_ar = ?, photo_url = ?,
-           from_club_country = ?, to_club_country = ?
+           from_club_country = ?, to_club_country = ?, player_country = ?
      WHERE id = ?
   `).run(player_ar, from_club_ar, to_club_ar, tweet_preview_ar,
-         photo_url, from_club_country, to_club_country, id);
+         photo_url, from_club_country, to_club_country, player_country, id);
+}
+
+export function getMissingPlayerCountry() {
+  return db.prepare(
+    'SELECT id, player FROM transfers WHERE player_country IS NULL'
+  ).all();
+}
+
+export function updatePlayerCountry(id, country) {
+  db.prepare('UPDATE transfers SET player_country = ? WHERE id = ?').run(country, id);
 }
 
 export function getComments(transferId) {

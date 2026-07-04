@@ -3,7 +3,7 @@ import { fetchNewTweets } from './twitter.js';
 import { extractTransferData } from './claude.js';
 import { getSinceId, setSinceId, upsertTransfer, logTweet, isTweetLogged } from './db.js';
 import { broadcast } from './api.js';
-import { translatePending } from './translate.js';
+import { translatePending, backfillPlayerCountries } from './translate.js';
 import { logUpdate } from './updateLog.js';
 
 let userId = null;
@@ -90,6 +90,7 @@ async function pollOnceInner() {
 
   // Translate any newly added transfers to Arabic
   const translatedCount = await translatePending();
+  await backfillPlayerCountries();
   logUpdate(addedCount, translatedCount);
 }
 

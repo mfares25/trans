@@ -1,5 +1,6 @@
 import axios from 'axios';
-import { getUntranslated, saveTranslation, updateFromClub, getTransferById } from './db.js';
+import { getUntranslated, saveTranslation, updateFromClub, getTransferById,
+         getMissingPlayerCountry, updatePlayerCountry } from './db.js';
 import { askClaude } from './claudeCli.js';
 import { broadcast } from './api.js';
 
@@ -11,6 +12,7 @@ Given transfer data, return ONLY a valid JSON object with these fields:
 - tweet_preview_ar: Full Arabic translation of the tweet text, keep emojis
 - from_club_country: Country of the selling club in English lowercase (e.g. "england", "germany", "spain"). Use null if unknown.
 - to_club_country: Country of the buying club in English lowercase. Use null if unknown.
+- player_country: Nationality of the player in English lowercase (e.g. "france", "brazil"). Use null if unknown.
 
 Return ONLY valid JSON, no markdown, no explanation.`;
 
@@ -99,6 +101,49 @@ async function translateOne(tr) {
   const result   = JSON.parse(jsonText);
 
   return { ...result, photo_url };
+}
+
+async function fetchPlayerCountry(playerName) {
+  try {
+    const raw = await askClaude(
+      'You are a football data assistant. Return ONLY valid JSON, no markdown, no explanation.',
+      `What is the nationality of footballer "${playerName}"? Return ONLY valid JSON: {"country":"england"} in English lowercase, or {"country":null} if unknown.`
+    );
+    const jsonText = raw.replace(/^```(?:json)?\s*/,'').replace(/\s*```$/,'').trim();
+    return JSON.parse(jsonText).country ?? null;
+  } catch {
+    return null;
+  }
+}
+
+let backfillInProgress = false;
+
+export async function backfillPlayerCountries() {
+  if (backfillInProgress) return 0;
+  backfillInProgress = true;
+  try {
+    const rows = getMissingPlayerCountry();
+    if (!rows.length) return 0;
+
+    console.log(`[translate] Backfilling nationality for ${rows.length} player(s)...`);
+    let count = 0;
+    for (const row of rows) {
+      const country = await fetchPlayerCountry(row.player);
+      if (country) {
+        updatePlayerCountry(row.id, country);
+        broadcast('transfer', getTransferById(row.id));
+        console.log(`[translate] 🌍 ${row.player} → ${country}`);
+        count++;
+      } else {
+        // Mark as checked so we don't keep retrying an unknown nationality forever
+        updatePlayerCountry(row.id, '');
+        console.log(`[translate] ⚪ ${row.player} → unknown, not retrying`);
+      }
+    }
+    return count;
+  } finally {
+    backfillInProgress = false;
+  }
 }
 
 let translateInProgress = false;
