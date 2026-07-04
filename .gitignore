@@ -5,5 +5,6 @@ keys.pub
 transfers.db-shm
 transfers.db-wal
 update.log
+server.log
 .DS_Store
 .claude/settings.local.json
