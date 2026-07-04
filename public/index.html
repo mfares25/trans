@@ -179,6 +179,19 @@ input,select{font:inherit;color:inherit;outline:none}
   align-content:start;
 }
 
+.pagination{
+  display:flex;align-items:center;justify-content:center;gap:14px;
+  padding:20px 0 4px;
+}
+.page-btn{
+  background:var(--sur2);border:1px solid var(--brd);color:var(--txt);
+  border-radius:var(--radius-sm);padding:6px 14px;font-size:13px;
+  cursor:pointer;transition:border-color .2s,opacity .2s;
+}
+.page-btn:hover:not(:disabled){border-color:var(--blue)}
+.page-btn:disabled{opacity:.35;cursor:default}
+.page-indicator{font-size:12px;color:var(--txt3)}
+
 /* ═══════════════════════════════════════════════════
    STATS ROW (inline in filter bar)
 ═══════════════════════════════════════════════════ */
@@ -636,6 +649,7 @@ input,select{font:inherit;color:inherit;outline:none}
 <!-- ══════════════════════════════ LAYOUT ══════════════════════════════ -->
 <div class="page-layout">
   <div class="cards-grid" id="cardsCol"></div>
+  <div class="pagination" id="pagination"></div>
 </div>
 
 <script>
@@ -666,6 +680,7 @@ const T = {
     just_now:'just now',min_ago:(m)=>`${m}m ago`,hr_ago:(h)=>`${h}h ago`,day_ago:(d)=>`${d}d ago`,
     unknown:'Unknown',lang_btn:'عربي',
     results:(n)=>`${n} transfer${n!==1?'s':''}`,
+    page_indicator:(p,n)=>`Page ${p} of ${n}`,
     cmt_title:'Comments',cmt_placeholder:'Write a comment…',cmt_name_ph:'Your name',
     cmt_submit:'Send',cmt_empty:'Be the first to comment!',cmt_anon:'Fan',
   },
@@ -692,6 +707,7 @@ const T = {
     just_now:'الآن',min_ago:(m)=>`منذ ${m} د`,hr_ago:(h)=>`منذ ${h} س`,day_ago:(d)=>`منذ ${d} ي`,
     unknown:'غير معروف',lang_btn:'English',
     results:(n)=>`${n} ${n===1?'انتقال':'انتقالات'}`,
+    page_indicator:(p,n)=>`صفحة ${p} من ${n}`,
     open_tweet:'فتح المصدر',
     cmt_title:'التعليقات',cmt_placeholder:'اكتب تعليقاً…',cmt_name_ph:'اسمك',
     cmt_submit:'إرسال',cmt_empty:'كن أول من يعلق!',cmt_anon:'مشجع',
@@ -1076,6 +1092,9 @@ function renderCard(tr, isNew = false) {
 // ══════════════════════════════════════════════
 // MAIN RENDER
 // ══════════════════════════════════════════════
+const PAGE_SIZE = 30;
+let currentPage = 1;
+
 function renderAll(flash = null) {
   const list = getFiltered();
   document.getElementById('resultCount').textContent = tf('results', list.length);
@@ -1083,11 +1102,34 @@ function renderAll(flash = null) {
   const col = document.getElementById('cardsCol');
   if (!list.length) {
     col.innerHTML = `<div class="empty"><div class="empty-icon">🔍</div><p>${t('no_transfers')}</p></div>`;
+    renderPagination(0, 1);
     return;
   }
 
-  col.innerHTML = list.map(tr => renderCard(tr, tr.id === flash)).join('');
+  const totalPages = Math.max(1, Math.ceil(list.length / PAGE_SIZE));
+  currentPage = Math.min(Math.max(currentPage, 1), totalPages);
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const pageItems = list.slice(start, start + PAGE_SIZE);
+
+  col.innerHTML = pageItems.map(tr => renderCard(tr, tr.id === flash)).join('');
   updateTabCounts();
+  renderPagination(totalPages, currentPage);
+}
+
+function renderPagination(totalPages, page) {
+  const el = document.getElementById('pagination');
+  if (totalPages <= 1) { el.innerHTML = ''; return; }
+  el.innerHTML = `
+    <button class="page-btn" ${page === 1 ? 'disabled' : ''} onclick="goToPage(${page - 1})">‹</button>
+    <span class="page-indicator">${tf('page_indicator', page, totalPages)}</span>
+    <button class="page-btn" ${page === totalPages ? 'disabled' : ''} onclick="goToPage(${page + 1})">›</button>
+  `;
+}
+
+function goToPage(n) {
+  currentPage = n;
+  renderAll();
+  document.getElementById('cardsCol').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function loadStats() {
@@ -1431,11 +1473,12 @@ document.getElementById('navTabs').addEventListener('click', e => {
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
   tab.classList.add('active');
   activePage = tab.dataset.page;
+  currentPage = 1;
   renderAll();
 });
 
 ['searchInput','statusFilter','sortSelect'].forEach(id => {
-  document.getElementById(id).addEventListener('input', () => renderAll());
+  document.getElementById(id).addEventListener('input', () => { currentPage = 1; renderAll(); });
 });
 
 // ══════════════════════════════════════════════
