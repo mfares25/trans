@@ -344,6 +344,7 @@ input,select{font:inherit;color:inherit;outline:none}
   border-radius:var(--radius-sm);
   font-size:11px;color:var(--txt2);line-height:1.5;
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  overflow-wrap:anywhere;word-break:break-word;
 }
 .tweet-preview::before{content:'"';color:var(--blue);font-size:14px;font-weight:800;margin-inline-end:2px}
 
@@ -429,6 +430,30 @@ input,select{font:inherit;color:inherit;outline:none}
   .cards-grid{grid-template-columns:1fr}
   .nav-tabs{display:none}
   .stats-inline{display:none}
+}
+@media(max-width:640px){
+  .header{flex-wrap:wrap;height:auto;padding:10px 12px;row-gap:8px}
+  .header-right{width:100%;margin-inline-start:0;justify-content:space-between}
+  .filter-bar{padding:10px 12px}
+  .search-wrap{flex:1 1 100%;min-width:0;max-width:none;order:-1}
+  .filter-bar-right{width:100%;justify-content:flex-end}
+  .page-layout{padding:12px}
+}
+@media(max-width:480px){
+  html,body{overflow-x:hidden;max-width:100vw}
+  .logo-text{font-size:14px}
+  .live-badge span:not(.live-dot){display:none}
+  .card-topbar{padding:8px 10px}
+  .card-main{flex-wrap:wrap;gap:10px;padding:10px 12px}
+  .player-info{max-width:100%;flex:1 1 100%}
+  .card-sep{display:none}
+  .clubs-inline{flex:1 1 100%;flex-direction:column;align-items:stretch;gap:8px;min-width:0}
+  .club-inline{width:100%;min-width:0}
+  .club-inline-name{white-space:normal;overflow-wrap:anywhere;text-overflow:clip}
+  .arrow-icon{align-self:center;transform:rotate(90deg)}
+  [dir="rtl"] .arrow-icon{transform:rotate(90deg)}
+  .fee-pill{align-self:center}
+  .card-footer{padding:8px 10px;flex-wrap:wrap;row-gap:6px}
 }
 
 /* ═══════════════════════════════════════════════════
