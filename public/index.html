@@ -185,10 +185,8 @@ html[data-tsize="2"] body{zoom:1.25}
 .page-layout{flex:1;overflow-y:auto;padding:16px 20px}
 
 .cards-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:12px;
-  align-content:start;
+  column-count:3;
+  column-gap:8px;
 }
 
 .pagination{
@@ -226,6 +224,8 @@ html[data-tsize="2"] body{zoom:1.25}
   display:flex;flex-direction:column;
   cursor:pointer;
   perspective:1200px;
+  break-inside:avoid;
+  margin-bottom:8px;
 }
 .t-card:hover{border-color:var(--brd2);box-shadow:var(--shadow)}
 .t-card.new{animation:cardIn .5s ease-out}
@@ -238,20 +238,20 @@ html[data-tsize="2"] body{zoom:1.25}
 .card-back{display:none;flex-direction:column;flex:1}
 .card-back-header{
   display:flex;align-items:center;justify-content:space-between;
-  padding:10px 14px;background:var(--sur2);
+  padding:14px 20px;background:var(--sur2);
   border-bottom:1px solid var(--brd);
   font-size:17px;font-weight:700;color:var(--txt);
 }
 .flip-close{
   background:none;border:none;cursor:pointer;
-  font-size:20px;color:var(--txt3);padding:2px 6px;
+  font-size:20px;color:var(--txt3);padding:3px 9px;
   border-radius:6px;transition:background .15s;
 }
 .flip-close:hover{background:var(--brd)}
 .tweet-list{overflow-y:auto;max-height:320px}
 .tweet-item{
   display:block;
-  padding:10px 14px;border-bottom:1px solid var(--brd);
+  padding:14px 20px;border-bottom:1px solid var(--brd);
 }
 .tweet-item:last-child{border-bottom:none}
 .tweet-item-text{
@@ -267,16 +267,16 @@ html[data-tsize="2"] body{zoom:1.25}
 
 /* top bar: badges + source */
 .card-topbar{
-  display:flex;align-items:center;gap:6px;
-  padding:9px 12px;border-bottom:1px solid var(--brd);
+  display:flex;align-items:center;gap:9px;
+  padding:13px 17px;border-bottom:1px solid var(--brd);
   background:var(--sur2);flex-wrap:wrap;
 }
 .source-tag{margin-inline-start:auto;font-size:14px;color:var(--txt3);white-space:nowrap}
 
 /* badges */
 .badge{
-  display:inline-flex;align-items:center;gap:4px;
-  border-radius:20px;padding:3px 9px;
+  display:inline-flex;align-items:center;gap:6px;
+  border-radius:20px;padding:4px 13px;
   font-size:14px;font-weight:700;letter-spacing:.2px;white-space:nowrap;
 }
 .badge-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
@@ -294,12 +294,12 @@ html[data-tsize="2"] body{zoom:1.25}
 
 /* ── CARD MAIN ROW ── */
 .card-main{
-  display:flex;flex-direction:column;gap:10px;
-  padding:12px 14px;
+  display:flex;flex-direction:column;gap:14px;
+  padding:17px 20px;
   border-bottom:1px solid var(--brd);
 }
 .player-info{
-  display:flex;align-items:center;gap:9px;
+  display:flex;align-items:center;gap:13px;
 }
 .player-photo-wrap{
   position:relative;
@@ -326,11 +326,11 @@ html[data-tsize="2"] body{zoom:1.25}
 .player-name{font-size:19px;font-weight:800;line-height:1.3;letter-spacing:-.1px}
 .card-sep{width:100%;height:1px;background:var(--brd);flex-shrink:0}
 .clubs-inline{
-  display:flex;align-items:center;gap:6px;
+  display:flex;align-items:center;gap:9px;
   width:100%;min-width:0;
 }
 .club-inline{
-  display:flex;align-items:center;gap:4px;
+  display:flex;align-items:center;gap:6px;
   flex:1;min-width:0;
 }
 .club-inline:first-child{justify-content:flex-end}
@@ -344,14 +344,14 @@ html[data-tsize="2"] body{zoom:1.25}
 [dir="rtl"] .arrow-icon{transform:scaleX(-1)}
 .fee-pill{
   background:var(--blue-d);color:var(--blue);
-  border-radius:20px;padding:2px 7px;
+  border-radius:20px;padding:3px 10px;
   font-size:14px;font-weight:700;white-space:nowrap;
 }
 
 /* tweet preview */
 .tweet-preview{
-  margin:0 12px 0;
-  padding:9px 11px;
+  margin:0 17px 0;
+  padding:13px 16px;
   background:var(--sur2);border:1px solid var(--brd);
   border-radius:var(--radius-sm);
   font-size:16px;color:var(--txt2);line-height:1.5;
@@ -361,13 +361,13 @@ html[data-tsize="2"] body{zoom:1.25}
 
 /* card footer */
 .card-footer{
-  display:flex;align-items:center;gap:8px;
-  padding:9px 12px;border-top:1px solid var(--brd);
+  display:flex;align-items:center;gap:11px;
+  padding:13px 17px;border-top:1px solid var(--brd);
   background:var(--sur2);font-size:16px;color:var(--txt3);
   margin-top:auto;
 }
 .footer-sep{flex:1}
-.conf-row{display:flex;align-items:center;gap:5px}
+.conf-row{display:flex;align-items:center;gap:7px}
 .conf-track{width:55px;height:4px;background:var(--brd);border-radius:2px;overflow:hidden}
 .conf-fill{height:100%;border-radius:2px;transition:width .5s}
 .conf-pct{font-size:16px;font-weight:700;color:var(--txt3)}
@@ -376,12 +376,12 @@ html[data-tsize="2"] body{zoom:1.25}
    PREDICTION
 ═══════════════════════════════════════════════════ */
 .prediction{
-  padding:12px 14px;border-top:1px solid var(--brd);
+  padding:17px 20px;border-top:1px solid var(--brd);
 }
 .pred-title{
   font-size:16px;font-weight:700;color:var(--txt2);
-  text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;
-  display:flex;align-items:center;gap:6px;
+  text-transform:uppercase;letter-spacing:.4px;margin-bottom:14px;
+  display:flex;align-items:center;gap:9px;
 }
 .pred-title::before{
   content:'';flex:1;height:1px;background:var(--brd);
@@ -389,12 +389,12 @@ html[data-tsize="2"] body{zoom:1.25}
 .pred-title::after{
   content:'';flex:1;height:1px;background:var(--brd);
 }
-.pred-btns{display:flex;gap:8px;margin-bottom:8px}
+.pred-btns{display:flex;gap:11px;margin-bottom:11px}
 .pred-btn{
-  flex:1;padding:8px;border-radius:var(--radius-sm);
+  flex:1;padding:11px;border-radius:var(--radius-sm);
   border:1.5px solid var(--brd);background:var(--sur);
   font-size:17px;font-weight:700;transition:var(--trans);
-  display:flex;align-items:center;justify-content:center;gap:6px;
+  display:flex;align-items:center;justify-content:center;gap:9px;
 }
 .pred-btn:hover:not(:disabled):not(.voted){border-color:var(--brd2);background:var(--sur2)}
 .pred-btn.yes:hover:not(:disabled):not(.voted){border-color:var(--green);color:var(--green);background:var(--green-d)}
@@ -402,11 +402,11 @@ html[data-tsize="2"] body{zoom:1.25}
 .pred-btn.voted-yes{border-color:var(--green);color:var(--green);background:var(--green-d)}
 .pred-btn.voted-no {border-color:var(--red);  color:var(--red);  background:var(--red-d)}
 .pred-btn:disabled{opacity:.6;cursor:default}
-.pred-bar-wrap{display:flex;align-items:center;gap:6px;font-size:16px;color:var(--txt3)}
+.pred-bar-wrap{display:flex;align-items:center;gap:9px;font-size:16px;color:var(--txt3)}
 .pred-bar{flex:1;height:5px;background:var(--brd);border-radius:3px;overflow:hidden;display:flex}
 .pred-bar-yes{height:100%;background:var(--green);transition:width .5s}
 .pred-bar-no {height:100%;background:var(--red);  transition:width .5s}
-.pred-votes{font-size:14px;color:var(--txt3);text-align:center;margin-top:4px}
+.pred-votes{font-size:14px;color:var(--txt3);text-align:center;margin-top:6px}
 
 
 /* ═══════════════════════════════════════════════════
@@ -436,9 +436,9 @@ html[data-tsize="2"] body{zoom:1.25}
 /* ═══════════════════════════════════════════════════
    RESPONSIVE
 ═══════════════════════════════════════════════════ */
-@media(max-width:1100px){.cards-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:1100px){.cards-grid{column-count:2}}
 @media(max-width:680px){
-  .cards-grid{grid-template-columns:1fr}
+  .cards-grid{column-count:1}
   .nav-tabs{display:none}
   .stats-inline{display:none}
 }
@@ -454,16 +454,16 @@ html[data-tsize="2"] body{zoom:1.25}
   html,body{overflow-x:hidden;max-width:100vw}
   .logo-text{font-size:20px}
   .live-badge span:not(.live-dot){display:none}
-  .card-topbar{padding:8px 10px}
-  .card-main{gap:10px;padding:10px 12px}
-  .clubs-inline{flex-direction:column;align-items:stretch;gap:8px}
+  .card-topbar{padding:11px 14px}
+  .card-main{gap:14px;padding:14px 17px}
+  .clubs-inline{flex-direction:column;align-items:stretch;gap:11px}
   .club-inline{width:100%;min-width:0}
   .club-inline:first-child,.club-inline:last-child{justify-content:center}
   .club-inline-name{text-align:center}
   .arrow-icon{align-self:center;transform:rotate(90deg)}
   [dir="rtl"] .arrow-icon{transform:rotate(90deg)}
   .fee-pill{align-self:center}
-  .card-footer{padding:8px 10px;flex-wrap:wrap;row-gap:6px}
+  .card-footer{padding:11px 14px;flex-wrap:wrap;row-gap:8px}
 }
 
 /* ═══════════════════════════════════════════════════
