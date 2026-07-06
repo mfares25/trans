@@ -5,7 +5,8 @@ import { dirname, join } from 'path';
 import { resolveUserId } from './twitter.js';
 import { router as apiRouter } from './api.js';
 import { setUserId, startCron } from './cron.js';
-import { translatePending, backfillPlayerCountries } from './translate.js';
+import { translatePending, backfillPlayerCountries, backfillEntityDescriptions } from './translate.js';
+import { backfillEntitySlugs } from './db.js';
 import { logUpdate } from './updateLog.js';
 
 // ── env validation ────────────────────────────────────────────────────────────
@@ -45,6 +46,13 @@ async function main() {
   app.use(express.static(join(__dirname, '..', 'public'), { etag: false, lastModified: false, setHeaders: (res) => res.setHeader('Cache-Control','no-store') }));
   app.use('/api', apiRouter);
 
+  app.get('/club/:slug', (_req, res) =>
+    res.sendFile(join(__dirname, '..', 'public', 'club.html'), { headers: { 'Cache-Control': 'no-store' } })
+  );
+  app.get('/player/:slug', (_req, res) =>
+    res.sendFile(join(__dirname, '..', 'public', 'player.html'), { headers: { 'Cache-Control': 'no-store' } })
+  );
+
   app.get('/health', (_req, res) =>
     res.json({ status: 'ok', time: new Date().toISOString() })
   );
@@ -52,9 +60,12 @@ async function main() {
   app.listen(PORT, async () => {
     console.log(`[http] Listening on http://localhost:${PORT}`);
     startCron();
+    const backfilled = backfillEntitySlugs();
+    if (backfilled) console.log(`[entities] Backfilled slugs for ${backfilled} transfer(s)`);
     if (process.env.POLL_DISABLED !== 'true') {
       const translatedCount = await translatePending();
       await backfillPlayerCountries();
+      await backfillEntityDescriptions();
       logUpdate(0, translatedCount);
     }
   });

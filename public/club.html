@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title id="pageTitle">Club — TransferWatch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --radius:14px;--radius-sm:8px;--radius-xs:6px;
+  --green:#22c55e;--green-d:rgba(34,197,94,.12);
+  --blue:#3b82f6; --blue-d:rgba(59,130,246,.12);
+  --orange:#f59e0b;--orange-d:rgba(245,158,11,.12);
+  --red:#ef4444;  --red-d:rgba(239,68,68,.12);
+  --purple:#a855f7;--purple-d:rgba(168,85,247,.12);
+  --cyan:#06b6d4; --cyan-d:rgba(6,182,212,.12);
+  --yellow:#eab308;--yellow-d:rgba(234,179,8,.12);
+  --trans: all .2s ease;
+}
+[data-theme="dark"]{
+  --bg:#080d16;--bg2:#0d1424;
+  --sur:#111827;--sur2:#1a2336;--sur3:#1f2a40;
+  --brd:#1e2d42;--brd2:#27384f;
+  --txt:#e2eaf5;--txt2:#94a3b8;--txt3:#64748b;
+  --shadow:0 4px 24px rgba(0,0,0,.4);
+}
+[data-theme="light"]{
+  --bg:#f1f5f9;--bg2:#e8edf3;
+  --sur:#ffffff;--sur2:#f8fafc;--sur3:#f1f5f9;
+  --brd:#e2e8f0;--brd2:#cbd5e1;
+  --txt:#0f172a;--txt2:#475569;--txt3:#94a3b8;
+  --shadow:0 4px 24px rgba(0,0,0,.08);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%}
+body{
+  background:var(--bg);color:var(--txt);
+  font-family:'Inter',sans-serif;font-size:17px;line-height:1.5;
+  transition:background .3s,color .3s;
+}
+[lang="ar"] body,[lang="ar"] *{font-family:'Tajawal',sans-serif}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;border:none;background:none;color:inherit;font:inherit}
+
+.header{
+  background:var(--sur);border-bottom:1px solid var(--brd);
+  padding:0 20px;height:58px;
+  display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:10;
+}
+.logo{display:flex;align-items:center;gap:9px}
+.logo-icon{
+  width:36px;height:36px;border-radius:10px;
+  background:linear-gradient(135deg,#3b82f6 0%,#8b5cf6 100%);
+  display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;
+}
+.logo-text{font-size:18px;font-weight:800;letter-spacing:-.3px}
+.logo-text em{font-style:normal;color:var(--blue)}
+.header-right{margin-inline-start:auto;display:flex;align-items:center;gap:8px}
+.icon-btn{
+  width:36px;height:36px;border-radius:9px;
+  background:var(--sur2);border:1px solid var(--brd);
+  display:flex;align-items:center;justify-content:center;
+  font-size:17px;transition:var(--trans);
+}
+.icon-btn:hover{border-color:var(--brd2);background:var(--sur3)}
+.lang-btn{
+  height:36px;padding:0 14px;border-radius:9px;
+  background:var(--sur2);border:1px solid var(--brd);
+  font-size:14px;font-weight:700;transition:var(--trans);
+}
+.lang-btn:hover{border-color:var(--blue);color:var(--blue)}
+
+.wrap{max-width:900px;margin:0 auto;padding:24px 20px 60px}
+
+.back-link{
+  display:inline-flex;align-items:center;gap:6px;
+  color:var(--txt3);font-size:14px;font-weight:600;margin-bottom:16px;
+}
+.back-link:hover{color:var(--blue)}
+
+.hero{
+  background:var(--sur);border:1px solid var(--brd);border-radius:var(--radius);
+  padding:24px;display:flex;gap:20px;align-items:center;flex-wrap:wrap;
+  box-shadow:var(--shadow);margin-bottom:20px;
+}
+.hero-photo-wrap{
+  position:relative;width:88px;height:88px;border-radius:18px;
+  border:3px solid var(--brd);flex-shrink:0;background:var(--sur3);
+}
+.hero-photo-wrap img{width:100%;height:100%;object-fit:cover;border-radius:15px;display:block}
+.hero-initials{
+  width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+  font-size:30px;font-weight:800;color:var(--txt2);
+}
+.hero-flag{position:absolute;bottom:-2px;right:-2px;font-size:26px;filter:drop-shadow(0 1px 3px rgba(0,0,0,.6))}
+.hero-info{flex:1;min-width:200px}
+.hero-name{font-size:26px;font-weight:800;letter-spacing:-.3px;margin-bottom:4px}
+.hero-sub{font-size:15px;color:var(--txt2)}
+.hero-desc{font-size:15px;color:var(--txt2);line-height:1.65;margin-top:14px;padding-top:14px;border-top:1px solid var(--brd)}
+
+.stats-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+.stat-pill{
+  display:flex;align-items:center;gap:6px;
+  background:var(--sur2);border:1px solid var(--brd);
+  border-radius:20px;padding:6px 14px;font-size:15px;font-weight:600;color:var(--txt2);
+}
+.stat-pill .sv{font-weight:800;color:var(--txt)}
+
+.section-title{font-size:15px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:12px}
+
+.rows{display:flex;flex-direction:column;gap:8px}
+.trow{
+  background:var(--sur);border:1px solid var(--brd);border-radius:var(--radius-sm);
+  padding:14px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+}
+.trow-clubs{display:flex;align-items:center;gap:8px;flex:1;min-width:220px;font-size:15px}
+.trow-clubs a{font-weight:700}
+.trow-clubs a:hover{color:var(--blue)}
+.trow-player{font-weight:700;margin-inline-end:10px}
+.trow-player a:hover{color:var(--blue)}
+.trow-arrow{color:var(--blue);flex-shrink:0}
+[dir="rtl"] .trow-arrow{transform:scaleX(-1)}
+.trow-fee{background:var(--blue-d);color:var(--blue);border-radius:20px;padding:3px 10px;font-size:13px;font-weight:700;white-space:nowrap}
+.trow-time{font-size:13px;color:var(--txt3);white-space:nowrap}
+.badge{
+  display:inline-flex;align-items:center;gap:6px;border-radius:20px;padding:4px 12px;
+  font-size:13px;font-weight:700;white-space:nowrap;
+}
+.b-confirmed   {background:var(--green-d); color:var(--green)}
+.b-agreement   {background:var(--cyan-d);  color:var(--cyan)}
+.b-adv-talks   {background:var(--blue-d);  color:var(--blue)}
+.b-talks       {background:var(--orange-d);color:var(--orange)}
+.b-interest    {background:var(--purple-d);color:var(--purple)}
+.b-loan        {background:var(--cyan-d);  color:var(--cyan)}
+.b-rejected,.b-cancelled{background:var(--red-d);color:var(--red)}
+.b-default     {background:var(--sur3);    color:var(--txt3)}
+
+.empty,.loading{
+  text-align:center;color:var(--txt3);padding:50px 20px;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a class="logo" href="/">
+    <div class="logo-icon">⚽</div>
+    <div class="logo-text">Transfer<em>Watch</em></div>
+  </a>
+  <div class="header-right">
+    <button class="lang-btn" id="langBtn">عربي</button>
+    <button class="icon-btn" id="themeBtn">🌙</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <a class="back-link" href="/" id="backLink">← <span id="backLabel">All transfers</span></a>
+  <div id="content" class="loading">Loading…</div>
+</div>
+
+<script>
+const slug  = decodeURIComponent(location.pathname.split('/').pop());
+let lang    = localStorage.getItem('lang')  || 'en';
+let theme   = localStorage.getItem('theme') || 'dark';
+
+const STR = {
+  en: {
+    back:'All transfers', section:'Transfer activity', empty:'No transfers found for this club yet.',
+    total:'Total transfers', incoming:'Arrivals', outgoing:'Departures', not_found:'Club not found.',
+    just_now:'just now', min_ago:m=>`${m}m ago`, hr_ago:h=>`${h}h ago`, day_ago:d=>`${d}d ago`,
+  },
+  ar: {
+    back:'كل الانتقالات', section:'نشاط الانتقالات', empty:'لا توجد انتقالات لهذا النادي حتى الآن.',
+    total:'إجمالي الانتقالات', incoming:'الوافدون', outgoing:'الراحلون', not_found:'النادي غير موجود.',
+    just_now:'الآن', min_ago:m=>`منذ ${m} د`, hr_ago:h=>`منذ ${h} س`, day_ago:d=>`منذ ${d} ي`,
+  },
+};
+
+const STATUS_MAP = {
+  confirmed:{en:'Confirmed',ar:'مؤكد',cls:'b-confirmed'},
+  agreement:{en:'Agreement',ar:'اتفاق',cls:'b-agreement'},
+  advanced_talks:{en:'Advanced Talks',ar:'محادثات متقدمة',cls:'b-adv-talks'},
+  talks:{en:'Talks',ar:'محادثات',cls:'b-talks'},
+  interest:{en:'Interest',ar:'اهتمام',cls:'b-interest'},
+  loan:{en:'Loan',ar:'إعارة',cls:'b-loan'},
+  rejected:{en:'Rejected',ar:'مرفوض',cls:'b-rejected'},
+  cancelled:{en:'Cancelled',ar:'ملغي',cls:'b-cancelled'},
+};
+
+const COUNTRY_FLAG = {
+  england:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', scotland:'🏴󠁧󠁢󠁳󠁣󠁴󠁿', wales:'🏴󠁧󠁢󠁷󠁬󠁳󠁿',
+  germany:'🇩🇪', spain:'🇪🇸', france:'🇫🇷', italy:'🇮🇹',
+  portugal:'🇵🇹', netherlands:'🇳🇱', belgium:'🇧🇪',
+  brazil:'🇧🇷', argentina:'🇦🇷', usa:'🇺🇸',
+  'saudi arabia':'🇸🇦', turkey:'🇹🇷', greece:'🇬🇷',
+  russia:'🇷🇺', japan:'🇯🇵', china:'🇨🇳', australia:'🇦🇺',
+  austria:'🇦🇹', switzerland:'🇨🇭', denmark:'🇩🇰', sweden:'🇸🇪',
+  norway:'🇳🇴', poland:'🇵🇱', ukraine:'🇺🇦', croatia:'🇭🇷',
+  serbia:'🇷🇸', czechia:'🇨🇿', slovakia:'🇸🇰', hungary:'🇭🇺',
+  romania:'🇷🇴', bulgaria:'🇧🇬', mexico:'🇲🇽', colombia:'🇨🇴',
+  uruguay:'🇺🇾', chile:'🇨🇱', 'south korea':'🇰🇷', iran:'🇮🇷',
+  morocco:'🇲🇦', egypt:'🇪🇬', nigeria:'🇳🇬', ghana:'🇬🇭',
+  'united arab emirates':'🇦🇪', qatar:'🇶🇦',
+};
+function flag(c) { return c ? (COUNTRY_FLAG[c.toLowerCase()] || '🌍') : ''; }
+
+function esc(str) {
+  return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function initials(name) {
+  const parts = (name || '').trim().split(/\s+/);
+  if (parts.length >= 2) return (parts[0][0] + parts[parts.length-1][0]).toUpperCase();
+  return (name || '?').slice(0,2).toUpperCase();
+}
+function timeAgo(ds) {
+  const m = Math.floor((Date.now() - new Date(ds)) / 60000);
+  if (m < 1)  return STR[lang].just_now;
+  if (m < 60) return STR[lang].min_ago(m);
+  const h = Math.floor(m / 60);
+  if (h < 24) return STR[lang].hr_ago(h);
+  return STR[lang].day_ago(Math.floor(h / 24));
+}
+
+function applyChrome() {
+  document.documentElement.lang = lang;
+  document.documentElement.dir  = lang === 'ar' ? 'rtl' : 'ltr';
+  document.documentElement.setAttribute('data-theme', theme);
+  document.getElementById('langBtn').textContent = lang === 'ar' ? 'English' : 'عربي';
+  document.getElementById('themeBtn').textContent = theme === 'dark' ? '☀️' : '🌙';
+  document.getElementById('backLabel').textContent = STR[lang].back;
+}
+document.getElementById('langBtn').addEventListener('click', () => {
+  lang = lang === 'ar' ? 'en' : 'ar';
+  localStorage.setItem('lang', lang);
+  applyChrome();
+  render();
+});
+document.getElementById('themeBtn').addEventListener('click', () => {
+  theme = theme === 'dark' ? 'light' : 'dark';
+  localStorage.setItem('theme', theme);
+  applyChrome();
+});
+applyChrome();
+
+function statusBadge(status) {
+  const m = STATUS_MAP[status];
+  if (!m) return `<span class="badge b-default">${esc(status || '—')}</span>`;
+  return `<span class="badge ${m.cls}">${esc(m[lang])}</span>`;
+}
+
+let data = null;
+
+function transferRow(tr) {
+  const ar     = lang === 'ar';
+  const player = (ar && tr.player_ar) || tr.player;
+  const from   = (ar && tr.from_club_ar) || tr.from_club || '—';
+  const to     = (ar && tr.to_club_ar)   || tr.to_club   || '—';
+  const playerLink = tr.player_slug
+    ? `<a href="/player/${encodeURIComponent(tr.player_slug)}">${esc(player)}</a>`
+    : esc(player);
+  const fromLink = tr.from_club_slug
+    ? `<a href="/club/${encodeURIComponent(tr.from_club_slug)}">${flag(tr.from_club_country)} ${esc(from)}</a>`
+    : `${flag(tr.from_club_country)} ${esc(from)}`;
+  const toLink = tr.to_club_slug
+    ? `<a href="/club/${encodeURIComponent(tr.to_club_slug)}">${flag(tr.to_club_country)} ${esc(to)}</a>`
+    : `${flag(tr.to_club_country)} ${esc(to)}`;
+
+  return `
+    <div class="trow">
+      <span class="trow-player">${playerLink}</span>
+      <div class="trow-clubs">
+        <span>${fromLink}</span>
+        <span class="trow-arrow">→</span>
+        <span>${toLink}</span>
+      </div>
+      ${tr.fee ? `<span class="trow-fee">${esc(tr.fee)}</span>` : ''}
+      ${statusBadge(tr.status)}
+      <span class="trow-time">${timeAgo(tr.updated_at)}</span>
+    </div>`;
+}
+
+function render() {
+  if (!data) return;
+  const { club, transfers, stats } = data;
+  const ar   = lang === 'ar';
+  const name = (ar && club.name_ar) || club.name;
+
+  document.title = `${name} — TransferWatch`;
+
+  const logoHtml = club.logo_url
+    ? `<img src="${esc(club.logo_url)}" alt="${esc(name)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+    : '';
+
+  document.getElementById('content').innerHTML = `
+    <div class="hero">
+      <div class="hero-photo-wrap">
+        ${logoHtml}
+        <div class="hero-initials" style="${club.logo_url ? 'display:none' : 'display:flex'}">${initials(club.name)}</div>
+        ${club.country ? `<span class="hero-flag">${flag(club.country)}</span>` : ''}
+      </div>
+      <div class="hero-info">
+        <div class="hero-name">${esc(name)}</div>
+        ${club.country ? `<div class="hero-sub">${esc(club.country.replace(/\b\w/g, c => c.toUpperCase()))}</div>` : ''}
+        ${club.description ? `<div class="hero-desc">${esc(club.description)}</div>` : ''}
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-pill">🔄 <span class="sv">${stats.total}</span> ${esc(STR[lang].total)}</div>
+      <div class="stat-pill">⬅️ <span class="sv">${stats.incoming}</span> ${esc(STR[lang].incoming)}</div>
+      <div class="stat-pill">➡️ <span class="sv">${stats.outgoing}</span> ${esc(STR[lang].outgoing)}</div>
+    </div>
+
+    <div class="section-title">${esc(STR[lang].section)}</div>
+    <div class="rows">
+      ${transfers.length ? transfers.map(transferRow).join('') : `<div class="empty">${esc(STR[lang].empty)}</div>`}
+    </div>
+  `;
+}
+
+fetch(`/api/clubs/${encodeURIComponent(slug)}`)
+  .then(r => { if (!r.ok) throw new Error('not found'); return r.json(); })
+  .then(json => { data = json; render(); })
+  .catch(() => {
+    document.getElementById('content').innerHTML = `<div class="empty">${esc(STR[lang].not_found)}</div>`;
+  });
+</script>
+</body>
+</html>

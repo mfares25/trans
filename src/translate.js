@@ -1,6 +1,8 @@
 import axios from 'axios';
 import { getUntranslated, saveTranslation, updateFromClub, getTransferById,
-         getMissingPlayerCountry, updatePlayerCountry } from './db.js';
+         getMissingPlayerCountry, updatePlayerCountry,
+         getPlayersMissingDescription, getClubsMissingDescription,
+         upsertPlayerEntity, upsertClubEntity } from './db.js';
 import { askClaude } from './claudeCli.js';
 import { broadcast } from './api.js';
 
@@ -57,6 +59,58 @@ async function fetchWikiSummary(playerName) {
     return pg.extract?.slice(0, 600) ?? null;
   } catch {
     return null;
+  }
+}
+
+// Generic Wikipedia summary+thumbnail lookup used to enrich club/player entity
+// pages (description + logo/photo) — independent of the transfer translation pipeline.
+async function fetchWikiEntitySummary(name, searchSuffix) {
+  try {
+    const { data: sr } = await axios.get('https://en.wikipedia.org/w/api.php', {
+      params: { action:'query', list:'search', srsearch:`${name} ${searchSuffix}`.trim(), format:'json', srlimit:1 },
+      headers: { 'User-Agent': 'TransferTracker/1.0 (football-transfer-app)' },
+      timeout: 6000,
+    });
+    const title = sr.query?.search?.[0]?.title;
+    if (!title) return null;
+
+    const { data: pg } = await axios.get(
+      `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`,
+      { headers: { 'User-Agent': 'TransferTracker/1.0 (football-transfer-app)' }, timeout: 6000 }
+    );
+    return { extract: pg.extract?.slice(0, 600) ?? null, thumbnail: pg.thumbnail?.source ?? null };
+  } catch {
+    return null;
+  }
+}
+
+let entityBackfillInProgress = false;
+
+// Fills in description/logo/photo for club and player entities that were
+// auto-created from transfer data but haven't been enriched yet.
+export async function backfillEntityDescriptions() {
+  if (entityBackfillInProgress) return 0;
+  entityBackfillInProgress = true;
+  try {
+    let count = 0;
+
+    for (const p of getPlayersMissingDescription(12)) {
+      const info = await fetchWikiEntitySummary(p.name, 'footballer');
+      upsertPlayerEntity({ name: p.name, description: info?.extract || '', photo_url: info?.thumbnail || null });
+      if (info?.extract) console.log(`[entities] 📖 player ${p.name}`);
+      count++;
+    }
+
+    for (const c of getClubsMissingDescription(12)) {
+      const info = await fetchWikiEntitySummary(c.name, 'football club');
+      upsertClubEntity({ name: c.name, description: info?.extract || '', logo_url: info?.thumbnail || null });
+      if (info?.extract) console.log(`[entities] 📖 club ${c.name}`);
+      count++;
+    }
+
+    return count;
+  } finally {
+    entityBackfillInProgress = false;
   }
 }
 

@@ -6,5 +6,6 @@ transfers.db-shm
 transfers.db-wal
 update.log
 server.log
+server_restart.log
 .DS_Store
 .claude/settings.local.json

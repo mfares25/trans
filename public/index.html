@@ -324,6 +324,7 @@ html[data-tsize="2"] body{zoom:1.25}
   font-size:20px;font-weight:800;color:var(--txt2);
 }
 .player-name{font-size:19px;font-weight:800;line-height:1.3;letter-spacing:-.1px}
+a.player-name:hover,a.club-inline-name:hover{color:var(--blue)}
 .card-sep{width:100%;height:1px;background:var(--brd);flex-shrink:0}
 .clubs-inline{
   display:flex;align-items:center;gap:9px;
@@ -1061,19 +1062,25 @@ function renderCard(tr, isNew = false) {
           <div class="player-initials" style="${initialsStyle}">${playerInitials(tr.player)}</div>
           ${tr.player_country ? `<span class="player-flag-badge">${countryFlag(tr.player_country)}</span>` : ''}
         </div>
-        <div class="player-name">${esc(player)}</div>
+        ${tr.player_slug
+          ? `<a class="player-name" href="/player/${encodeURIComponent(tr.player_slug)}" onclick="event.stopPropagation()">${esc(player)}</a>`
+          : `<div class="player-name">${esc(player)}</div>`}
       </div>
       <div class="card-sep"></div>
       <div class="clubs-inline">
         <div class="club-inline">
           <span class="club-flag">${fFlag}</span>
-          <span class="club-inline-name" title="${esc(from)}">${esc(from)}</span>
+          ${tr.from_club_slug
+            ? `<a class="club-inline-name" href="/club/${encodeURIComponent(tr.from_club_slug)}" title="${esc(from)}" onclick="event.stopPropagation()">${esc(from)}</a>`
+            : `<span class="club-inline-name" title="${esc(from)}">${esc(from)}</span>`}
         </div>
         <span class="arrow-icon">→</span>
         ${tr.fee ? `<span class="fee-pill">${esc(tr.fee)}</span>` : ''}
         <div class="club-inline">
           <span class="club-flag">${tFlag}</span>
-          <span class="club-inline-name" title="${esc(to)}">${esc(to)}</span>
+          ${tr.to_club_slug
+            ? `<a class="club-inline-name" href="/club/${encodeURIComponent(tr.to_club_slug)}" title="${esc(to)}" onclick="event.stopPropagation()">${esc(to)}</a>`
+            : `<span class="club-inline-name" title="${esc(to)}">${esc(to)}</span>`}
         </div>
       </div>
     </div>

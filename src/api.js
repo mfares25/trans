@@ -1,5 +1,6 @@
 import { Router } from 'express';
-import { getAllTransfers, getTransferById, getRecentTweets, getStats, castVote, getComments, addComment } from './db.js';
+import { getAllTransfers, getTransferById, getRecentTweets, getStats, castVote, getComments, addComment,
+         getClubBySlug, getPlayerBySlug, getClubTransfers, getPlayerTransfers, listClubs, listPlayers } from './db.js';
 
 export const router = Router();
 
@@ -53,6 +54,40 @@ router.post('/transfers/:id/comments', (req, res) => {
   const comment = addComment(id, nickname, body);
   broadcast('comment', { transfer_id: id, comment });
   res.status(201).json(comment);
+});
+
+// ── Club / player entity pages ────────────────────────────────────────────────
+
+router.get('/clubs', (_req, res) => {
+  res.json(listClubs());
+});
+
+router.get('/clubs/:slug', (req, res) => {
+  const club = getClubBySlug(req.params.slug);
+  if (!club) return res.status(404).json({ error: 'Not found' });
+
+  const transfers = getClubTransfers(req.params.slug);
+  const incoming   = transfers.filter(t => t.to_club_slug === req.params.slug);
+  const outgoing   = transfers.filter(t => t.from_club_slug === req.params.slug);
+
+  res.json({
+    club,
+    transfers,
+    stats: { total: transfers.length, incoming: incoming.length, outgoing: outgoing.length },
+  });
+});
+
+router.get('/players', (_req, res) => {
+  res.json(listPlayers());
+});
+
+router.get('/players/:slug', (req, res) => {
+  const player = getPlayerBySlug(req.params.slug);
+  if (!player) return res.status(404).json({ error: 'Not found' });
+
+  const transfers = getPlayerTransfers(req.params.slug);
+
+  res.json({ player, transfers, stats: { total: transfers.length } });
 });
 
 router.get('/tweets', (req, res) => {

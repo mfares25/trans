@@ -9,7 +9,8 @@ db.exec('PRAGMA journal_mode = WAL');
 
 // Add Arabic columns if they don't exist yet (safe on existing DBs)
 ['player_ar','from_club_ar','to_club_ar','tweet_preview_ar',
- 'photo_url','from_club_country','to_club_country','news_source','player_country'].forEach(col => {
+ 'photo_url','from_club_country','to_club_country','news_source','player_country',
+ 'player_slug','from_club_slug','to_club_slug'].forEach(col => {
   try { db.exec(`ALTER TABLE transfers ADD COLUMN ${col} TEXT`); } catch {}
 });
 
@@ -58,6 +59,28 @@ db.exec(`
     transfer_id   INTEGER,
     extracted     INTEGER NOT NULL DEFAULT 0
   );
+
+  CREATE TABLE IF NOT EXISTS clubs (
+    slug        TEXT PRIMARY KEY,
+    name        TEXT NOT NULL,
+    name_ar     TEXT,
+    country     TEXT,
+    logo_url    TEXT,
+    description TEXT,
+    created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS players (
+    slug        TEXT PRIMARY KEY,
+    name        TEXT NOT NULL,
+    name_ar     TEXT,
+    country     TEXT,
+    photo_url   TEXT,
+    description TEXT,
+    created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+  );
 `);
 
 // ── metadata ──────────────────────────────────────────────────────────────────
@@ -101,6 +124,178 @@ function clubMatches(a, b) {
   return na === nb || na.includes(nb) || nb.includes(na);
 }
 
+// ── club/player entity helpers ────────────────────────────────────────────────
+
+function slugify(s) {
+  return (s ?? '')
+    .toString()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function uniqueSlug(table, base) {
+  if (!base) return null;
+  let slug = base, i = 2;
+  while (db.prepare(`SELECT 1 FROM ${table} WHERE slug = ?`).get(slug)) {
+    slug = `${base}-${i++}`;
+  }
+  return slug;
+}
+
+function findClubSlug(name) {
+  if (!name) return null;
+  const target = normalizeClub(name);
+  if (!target) return null;
+  const hit = db.prepare('SELECT slug, name FROM clubs').all().find((r) => {
+    const n = normalizeClub(r.name);
+    return n === target || n.includes(target) || target.includes(n);
+  });
+  return hit?.slug ?? null;
+}
+
+function findPlayerSlug(name) {
+  if (!name) return null;
+  const target = normalize(name);
+  if (!target) return null;
+  const hit = db.prepare('SELECT slug, name FROM players').all().find((r) => {
+    const n = normalize(r.name);
+    return n === target || n.includes(target) || target.includes(n);
+  });
+  return hit?.slug ?? null;
+}
+
+// Creates the club on first sighting, or enriches/merges into the existing
+// entity on subsequent sightings. Returns the slug (or null if no name given).
+export function upsertClubEntity({ name, name_ar, country, logo_url, description } = {}) {
+  if (!name) return null;
+  let slug = findClubSlug(name);
+  if (!slug) {
+    slug = uniqueSlug('clubs', slugify(name));
+    if (!slug) return null;
+    db.prepare(`
+      INSERT INTO clubs (slug, name, name_ar, country, logo_url, description)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `).run(slug, name, name_ar ?? null, country ?? null, logo_url ?? null, description ?? null);
+    return slug;
+  }
+  db.prepare(`
+    UPDATE clubs SET
+      name        = CASE WHEN length(?) > length(name) THEN ? ELSE name END,
+      name_ar     = COALESCE(name_ar, ?),
+      country     = COALESCE(country, ?),
+      logo_url    = COALESCE(logo_url, ?),
+      description = COALESCE(description, ?),
+      updated_at  = CURRENT_TIMESTAMP
+    WHERE slug = ?
+  `).run(name, name, name_ar ?? null, country ?? null, logo_url ?? null, description ?? null, slug);
+  return slug;
+}
+
+export function upsertPlayerEntity({ name, name_ar, country, photo_url, description } = {}) {
+  if (!name) return null;
+  let slug = findPlayerSlug(name);
+  if (!slug) {
+    slug = uniqueSlug('players', slugify(name));
+    if (!slug) return null;
+    db.prepare(`
+      INSERT INTO players (slug, name, name_ar, country, photo_url, description)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `).run(slug, name, name_ar ?? null, country ?? null, photo_url ?? null, description ?? null);
+    return slug;
+  }
+  db.prepare(`
+    UPDATE players SET
+      name        = CASE WHEN length(?) > length(name) THEN ? ELSE name END,
+      name_ar     = COALESCE(name_ar, ?),
+      country     = COALESCE(country, ?),
+      photo_url   = COALESCE(photo_url, ?),
+      description = COALESCE(description, ?),
+      updated_at  = CURRENT_TIMESTAMP
+    WHERE slug = ?
+  `).run(name, name, name_ar ?? null, country ?? null, photo_url ?? null, description ?? null, slug);
+  return slug;
+}
+
+export function getClubBySlug(slug) {
+  return db.prepare('SELECT * FROM clubs WHERE slug = ?').get(slug) ?? null;
+}
+
+export function getPlayerBySlug(slug) {
+  return db.prepare('SELECT * FROM players WHERE slug = ?').get(slug) ?? null;
+}
+
+export function listClubs() {
+  return db.prepare(`
+    SELECT c.*,
+      (SELECT COUNT(*) FROM transfers WHERE from_club_slug = c.slug OR to_club_slug = c.slug) AS transfer_count
+    FROM clubs c ORDER BY name COLLATE NOCASE
+  `).all();
+}
+
+export function listPlayers() {
+  return db.prepare(`
+    SELECT p.*,
+      (SELECT COUNT(*) FROM transfers WHERE player_slug = p.slug) AS transfer_count
+    FROM players p ORDER BY name COLLATE NOCASE
+  `).all();
+}
+
+const TRANSFER_SELECT = `
+  SELECT t.*,
+    COALESCE(pr.yes_count,0) AS yes_count,
+    COALESCE(pr.no_count,0) AS no_count,
+    COALESCE(cm.comment_count,0) AS comment_count
+  FROM transfers t
+  LEFT JOIN predictions pr ON t.id = pr.transfer_id
+  LEFT JOIN (SELECT transfer_id, COUNT(*) AS comment_count FROM comments GROUP BY transfer_id) cm ON t.id = cm.transfer_id
+`;
+
+export function getClubTransfers(slug) {
+  return db.prepare(`${TRANSFER_SELECT} WHERE t.from_club_slug = ? OR t.to_club_slug = ? ORDER BY t.updated_at DESC`)
+    .all(slug, slug);
+}
+
+export function getPlayerTransfers(slug) {
+  return db.prepare(`${TRANSFER_SELECT} WHERE t.player_slug = ? ORDER BY t.updated_at DESC`)
+    .all(slug);
+}
+
+export function getPlayersMissingDescription(limit = 12) {
+  return db.prepare('SELECT slug, name FROM players WHERE description IS NULL LIMIT ?').all(limit);
+}
+
+export function getClubsMissingDescription(limit = 12) {
+  return db.prepare('SELECT slug, name FROM clubs WHERE description IS NULL LIMIT ?').all(limit);
+}
+
+// One-time (idempotent) backfill: populates clubs/players tables and the
+// transfers.*_slug columns for rows that predate the entities feature.
+export function backfillEntitySlugs() {
+  const rows = db.prepare(`
+    SELECT * FROM transfers
+    WHERE player_slug IS NULL
+       OR (from_club IS NOT NULL AND from_club_slug IS NULL)
+       OR (to_club   IS NOT NULL AND to_club_slug   IS NULL)
+  `).all();
+
+  for (const r of rows) {
+    const playerSlug = upsertPlayerEntity({ name: r.player, name_ar: r.player_ar, country: r.player_country, photo_url: r.photo_url });
+    const fromSlug   = r.from_club ? upsertClubEntity({ name: r.from_club, name_ar: r.from_club_ar, country: r.from_club_country }) : null;
+    const toSlug     = r.to_club   ? upsertClubEntity({ name: r.to_club,   name_ar: r.to_club_ar,   country: r.to_club_country })   : null;
+
+    db.prepare(`
+      UPDATE transfers
+         SET player_slug = COALESCE(?, player_slug),
+             from_club_slug = COALESCE(?, from_club_slug),
+             to_club_slug = COALESCE(?, to_club_slug)
+       WHERE id = ?
+    `).run(playerSlug, fromSlug, toSlug, r.id);
+  }
+  return rows.length;
+}
+
 function findMatchingTransfer(player, fromClub, toClub) {
   // Full scan is fine — transfer counts stay in the hundreds
   const rows = db.prepare('SELECT * FROM transfers ORDER BY updated_at DESC').all();
@@ -130,6 +325,10 @@ export function upsertTransfer(data, tweetId, tweetText, source = null, pubDate 
     const bestPlayer = normalize(player).length > normalize(existing.player).length
       ? player : existing.player;
 
+    const playerSlug = upsertPlayerEntity({ name: bestPlayer });
+    const fromSlug    = from_club ? upsertClubEntity({ name: from_club }) : existing.from_club_slug;
+    const toSlug      = to_club   ? upsertClubEntity({ name: to_club })   : existing.to_club_slug;
+
     db.prepare(`
       UPDATE transfers
          SET player      = ?,
@@ -141,19 +340,28 @@ export function upsertTransfer(data, tweetId, tweetText, source = null, pubDate 
              tweet_ids   = ?,
              raw_tweets  = ?,
              news_source = COALESCE(news_source, ?),
-             updated_at  = COALESCE(?, CURRENT_TIMESTAMP)
+             updated_at  = COALESCE(?, CURRENT_TIMESTAMP),
+             player_slug = ?,
+             from_club_slug = COALESCE(?, from_club_slug),
+             to_club_slug = COALESCE(?, to_club_slug)
        WHERE id = ?
     `).run(bestPlayer, from_club, to_club, fee, status, confidence,
-           JSON.stringify(tweetIds), JSON.stringify(rawTweets), source, ts, existing.id);
+           JSON.stringify(tweetIds), JSON.stringify(rawTweets), source, ts,
+           playerSlug, fromSlug, toSlug, existing.id);
 
     return { ...getTransferById(existing.id), _action: 'updated' };
   }
 
+  const playerSlug = upsertPlayerEntity({ name: player });
+  const fromSlug    = from_club ? upsertClubEntity({ name: from_club }) : null;
+  const toSlug      = to_club   ? upsertClubEntity({ name: to_club })   : null;
+
   const result = db.prepare(`
-    INSERT INTO transfers (player, from_club, to_club, fee, status, confidence, tweet_ids, raw_tweets, news_source, created_at, updated_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, COALESCE(?,CURRENT_TIMESTAMP), COALESCE(?,CURRENT_TIMESTAMP))
+    INSERT INTO transfers (player, from_club, to_club, fee, status, confidence, tweet_ids, raw_tweets, news_source, created_at, updated_at, player_slug, from_club_slug, to_club_slug)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, COALESCE(?,CURRENT_TIMESTAMP), COALESCE(?,CURRENT_TIMESTAMP), ?, ?, ?)
   `).run(player, from_club, to_club, fee, status, confidence,
-         JSON.stringify([tweetId]), JSON.stringify([tweetText]), source, ts, ts);
+         JSON.stringify([tweetId]), JSON.stringify([tweetText]), source, ts, ts,
+         playerSlug, fromSlug, toSlug);
 
   return { ...getTransferById(Number(result.lastInsertRowid)), _action: 'created' };
 }
@@ -213,13 +421,15 @@ export function getTransferById(id) {
 }
 
 export function updateFromClub(id, from_club, from_club_ar, from_club_country) {
+  const slug = from_club ? upsertClubEntity({ name: from_club, name_ar: from_club_ar, country: from_club_country }) : null;
   db.prepare(`
     UPDATE transfers
        SET from_club = COALESCE(?, from_club),
            from_club_ar = COALESCE(?, from_club_ar),
-           from_club_country = COALESCE(?, from_club_country)
+           from_club_country = COALESCE(?, from_club_country),
+           from_club_slug = COALESCE(?, from_club_slug)
      WHERE id = ?
-  `).run(from_club, from_club_ar, from_club_country, id);
+  `).run(from_club, from_club_ar, from_club_country, slug, id);
 }
 
 export function getUntranslated() {
@@ -231,6 +441,14 @@ export function getUntranslated() {
 export function saveTranslation(id, data) {
   const { player_ar, from_club_ar, to_club_ar, tweet_preview_ar,
           photo_url, from_club_country, to_club_country, player_country } = data;
+
+  const tr = getTransferById(id);
+  if (tr) {
+    if (tr.player)    upsertPlayerEntity({ name: tr.player, name_ar: player_ar, country: player_country, photo_url });
+    if (tr.from_club) upsertClubEntity({ name: tr.from_club, name_ar: from_club_ar, country: from_club_country });
+    if (tr.to_club)   upsertClubEntity({ name: tr.to_club, name_ar: to_club_ar, country: to_club_country });
+  }
+
   db.prepare(`
     UPDATE transfers
        SET player_ar = ?, from_club_ar = ?, to_club_ar = ?,
